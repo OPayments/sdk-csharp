@@ -43,13 +43,13 @@ namespace OPayments.SDK.Model
         /// <param name="updatedAt">updatedAt</param>
         /// <param name="description">description</param>
         /// <param name="paymentUrl">Адрес оплаты для платежа в статусе pending.</param>
-        /// <param name="expiresAt">expiresAt</param>
         /// <param name="failureCode">failureCode</param>
-        /// <param name="failureMessage">failureMessage</param>
+        /// <param name="failureMessage">Нормализованное сообщение, безопасное для показа мерчанту; никогда не содержит сырой ответ провайдера, credentials или данные карты.</param>
+        /// <param name="refundSummary">refundSummary</param>
         /// <param name="completedAt">completedAt</param>
-        /// <param name="refund">refund</param>
+        /// <param name="refunds">Устарело, так как список неограничен. Используйте GET /payments/{paymentId}/refunds.</param>
         [JsonConstructor]
-        public PaymentDetails(Guid paymentId, string orderId, int amount, CurrencyEnum currency, PaymentMethodEnum paymentMethod, StatusEnum status, DateTime createdAt, DateTime updatedAt, Option<string?> description = default, Option<string?> paymentUrl = default, Option<DateTime?> expiresAt = default, Option<string?> failureCode = default, Option<string?> failureMessage = default, Option<DateTime?> completedAt = default, Option<Refund?> refund = default)
+        public PaymentDetails(Guid paymentId, string orderId, int amount, CurrencyEnum currency, PaymentMethodEnum paymentMethod, StatusEnum status, DateTime createdAt, DateTime updatedAt, Option<string?> description = default, Option<string?> paymentUrl = default, Option<string?> failureCode = default, Option<string?> failureMessage = default, Option<RefundSummary?> refundSummary = default, Option<DateTime?> completedAt = default, Option<List<Refund>?> refunds = default)
         {
             PaymentId = paymentId;
             OrderId = orderId;
@@ -61,11 +61,11 @@ namespace OPayments.SDK.Model
             UpdatedAt = updatedAt;
             DescriptionOption = description;
             PaymentUrlOption = paymentUrl;
-            ExpiresAtOption = expiresAt;
             FailureCodeOption = failureCode;
             FailureMessageOption = failureMessage;
+            RefundSummaryOption = refundSummary;
             CompletedAtOption = completedAt;
-            RefundOption = refund;
+            RefundsOption = refunds;
             OnCreated();
         }
 
@@ -374,19 +374,6 @@ namespace OPayments.SDK.Model
         public string? PaymentUrl { get { return this.PaymentUrlOption.Value; } set { this.PaymentUrlOption = new(value); } }
 
         /// <summary>
-        /// Used to track the state of ExpiresAt
-        /// </summary>
-        [JsonIgnore]
-        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
-        public Option<DateTime?> ExpiresAtOption { get; private set; }
-
-        /// <summary>
-        /// Gets or Sets ExpiresAt
-        /// </summary>
-        [JsonPropertyName("expiresAt")]
-        public DateTime? ExpiresAt { get { return this.ExpiresAtOption.Value; } set { this.ExpiresAtOption = new(value); } }
-
-        /// <summary>
         /// Used to track the state of FailureCode
         /// </summary>
         [JsonIgnore]
@@ -407,10 +394,24 @@ namespace OPayments.SDK.Model
         public Option<string?> FailureMessageOption { get; private set; }
 
         /// <summary>
-        /// Gets or Sets FailureMessage
+        /// Нормализованное сообщение, безопасное для показа мерчанту; никогда не содержит сырой ответ провайдера, credentials или данные карты.
         /// </summary>
+        /// <value>Нормализованное сообщение, безопасное для показа мерчанту; никогда не содержит сырой ответ провайдера, credentials или данные карты.</value>
         [JsonPropertyName("failureMessage")]
         public string? FailureMessage { get { return this.FailureMessageOption.Value; } set { this.FailureMessageOption = new(value); } }
+
+        /// <summary>
+        /// Used to track the state of RefundSummary
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<RefundSummary?> RefundSummaryOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets RefundSummary
+        /// </summary>
+        [JsonPropertyName("refundSummary")]
+        public RefundSummary? RefundSummary { get { return this.RefundSummaryOption.Value; } set { this.RefundSummaryOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of CompletedAt
@@ -426,17 +427,19 @@ namespace OPayments.SDK.Model
         public DateTime? CompletedAt { get { return this.CompletedAtOption.Value; } set { this.CompletedAtOption = new(value); } }
 
         /// <summary>
-        /// Used to track the state of Refund
+        /// Used to track the state of Refunds
         /// </summary>
         [JsonIgnore]
         [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
-        public Option<Refund?> RefundOption { get; private set; }
+        public Option<List<Refund>?> RefundsOption { get; private set; }
 
         /// <summary>
-        /// Gets or Sets Refund
+        /// Устарело, так как список неограничен. Используйте GET /payments/{paymentId}/refunds.
         /// </summary>
-        [JsonPropertyName("refund")]
-        public Refund? Refund { get { return this.RefundOption.Value; } set { this.RefundOption = new(value); } }
+        /// <value>Устарело, так как список неограничен. Используйте GET /payments/{paymentId}/refunds.</value>
+        [JsonPropertyName("refunds")]
+        [Obsolete]
+        public List<Refund>? Refunds { get { return this.RefundsOption.Value; } set { this.RefundsOption = new(value); } }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -456,11 +459,11 @@ namespace OPayments.SDK.Model
             sb.Append("  UpdatedAt: ").Append(UpdatedAt).Append("\n");
             sb.Append("  Description: ").Append(Description).Append("\n");
             sb.Append("  PaymentUrl: ").Append(PaymentUrl).Append("\n");
-            sb.Append("  ExpiresAt: ").Append(ExpiresAt).Append("\n");
             sb.Append("  FailureCode: ").Append(FailureCode).Append("\n");
             sb.Append("  FailureMessage: ").Append(FailureMessage).Append("\n");
+            sb.Append("  RefundSummary: ").Append(RefundSummary).Append("\n");
             sb.Append("  CompletedAt: ").Append(CompletedAt).Append("\n");
-            sb.Append("  Refund: ").Append(Refund).Append("\n");
+            sb.Append("  Refunds: ").Append(Refunds).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -514,11 +517,6 @@ namespace OPayments.SDK.Model
         public string UpdatedAtFormat { get; private set; } = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffK";
 
         /// <summary>
-        /// The format to use to serialize ExpiresAt
-        /// </summary>
-        public string ExpiresAtFormat { get; private set; } = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffK";
-
-        /// <summary>
         /// The format to use to serialize CompletedAt
         /// </summary>
         public string CompletedAtFormat { get; private set; } = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffK";
@@ -550,11 +548,11 @@ namespace OPayments.SDK.Model
             Option<DateTime?> updatedAt = default;
             Option<string?> description = default;
             Option<string?> paymentUrl = default;
-            Option<DateTime?> expiresAt = default;
             Option<string?> failureCode = default;
             Option<string?> failureMessage = default;
+            Option<RefundSummary?> refundSummary = default;
             Option<DateTime?> completedAt = default;
-            Option<Refund?> refund = default;
+            Option<List<Refund>?> refunds = default;
 
             while (utf8JsonReader.Read())
             {
@@ -622,20 +620,20 @@ namespace OPayments.SDK.Model
                         case "paymentUrl":
                             paymentUrl = new Option<string?>(utf8JsonReader.GetString()!);
                             break;
-                        case "expiresAt":
-                            expiresAt = new Option<DateTime?>(JsonSerializer.Deserialize<DateTime>(ref utf8JsonReader, jsonSerializerOptions));
-                            break;
                         case "failureCode":
                             failureCode = new Option<string?>(utf8JsonReader.GetString()!);
                             break;
                         case "failureMessage":
                             failureMessage = new Option<string?>(utf8JsonReader.GetString()!);
                             break;
+                        case "refundSummary":
+                            refundSummary = new Option<RefundSummary?>(JsonSerializer.Deserialize<RefundSummary>(ref utf8JsonReader, jsonSerializerOptions)!);
+                            break;
                         case "completedAt":
                             completedAt = new Option<DateTime?>(JsonSerializer.Deserialize<DateTime>(ref utf8JsonReader, jsonSerializerOptions));
                             break;
-                        case "refund":
-                            refund = new Option<Refund?>(JsonSerializer.Deserialize<Refund>(ref utf8JsonReader, jsonSerializerOptions)!);
+                        case "refunds":
+                            refunds = new Option<List<Refund>?>(JsonSerializer.Deserialize<List<Refund>>(ref utf8JsonReader, jsonSerializerOptions)!);
                             break;
                         default:
                             break;
@@ -697,22 +695,22 @@ namespace OPayments.SDK.Model
             if (paymentUrl.IsSet && paymentUrl.Value == null)
                 throw new ArgumentNullException(nameof(paymentUrl), "Property is not nullable for class PaymentDetails.");
 
-            if (expiresAt.IsSet && expiresAt.Value == null)
-                throw new ArgumentNullException(nameof(expiresAt), "Property is not nullable for class PaymentDetails.");
-
             if (failureCode.IsSet && failureCode.Value == null)
                 throw new ArgumentNullException(nameof(failureCode), "Property is not nullable for class PaymentDetails.");
 
             if (failureMessage.IsSet && failureMessage.Value == null)
                 throw new ArgumentNullException(nameof(failureMessage), "Property is not nullable for class PaymentDetails.");
 
+            if (refundSummary.IsSet && refundSummary.Value == null)
+                throw new ArgumentNullException(nameof(refundSummary), "Property is not nullable for class PaymentDetails.");
+
             if (completedAt.IsSet && completedAt.Value == null)
                 throw new ArgumentNullException(nameof(completedAt), "Property is not nullable for class PaymentDetails.");
 
-            if (refund.IsSet && refund.Value == null)
-                throw new ArgumentNullException(nameof(refund), "Property is not nullable for class PaymentDetails.");
+            if (refunds.IsSet && refunds.Value == null)
+                throw new ArgumentNullException(nameof(refunds), "Property is not nullable for class PaymentDetails.");
 
-            return new PaymentDetails(paymentId.Value!.Value!, orderId.Value!, amount.Value!.Value!, currency.Value!.Value!, paymentMethod.Value!.Value!, status.Value!.Value!, createdAt.Value!.Value!, updatedAt.Value!.Value!, description, paymentUrl, expiresAt, failureCode, failureMessage, completedAt, refund);
+            return new PaymentDetails(paymentId.Value!.Value!, orderId.Value!, amount.Value!.Value!, currency.Value!.Value!, paymentMethod.Value!.Value!, status.Value!.Value!, createdAt.Value!.Value!, updatedAt.Value!.Value!, description, paymentUrl, failureCode, failureMessage, refundSummary, completedAt, refunds);
         }
 
         /// <summary>
@@ -754,8 +752,11 @@ namespace OPayments.SDK.Model
             if (paymentDetails.FailureMessageOption.IsSet && paymentDetails.FailureMessage == null)
                 throw new ArgumentNullException(nameof(paymentDetails.FailureMessage), "Property is required for class PaymentDetails.");
 
-            if (paymentDetails.RefundOption.IsSet && paymentDetails.Refund == null)
-                throw new ArgumentNullException(nameof(paymentDetails.Refund), "Property is required for class PaymentDetails.");
+            if (paymentDetails.RefundSummaryOption.IsSet && paymentDetails.RefundSummary == null)
+                throw new ArgumentNullException(nameof(paymentDetails.RefundSummary), "Property is required for class PaymentDetails.");
+
+            if (paymentDetails.RefundsOption.IsSet && paymentDetails.Refunds == null)
+                throw new ArgumentNullException(nameof(paymentDetails.Refunds), "Property is required for class PaymentDetails.");
 
             writer.WriteString("paymentId", paymentDetails.PaymentId);
 
@@ -779,22 +780,24 @@ namespace OPayments.SDK.Model
             if (paymentDetails.PaymentUrlOption.IsSet)
                 writer.WriteString("paymentUrl", paymentDetails.PaymentUrl);
 
-            if (paymentDetails.ExpiresAtOption.IsSet)
-                writer.WriteString("expiresAt", paymentDetails.ExpiresAtOption.Value!.Value.ToString(ExpiresAtFormat));
-
             if (paymentDetails.FailureCodeOption.IsSet)
                 writer.WriteString("failureCode", paymentDetails.FailureCode);
 
             if (paymentDetails.FailureMessageOption.IsSet)
                 writer.WriteString("failureMessage", paymentDetails.FailureMessage);
 
+            if (paymentDetails.RefundSummaryOption.IsSet)
+            {
+                writer.WritePropertyName("refundSummary");
+                JsonSerializer.Serialize(writer, paymentDetails.RefundSummary, jsonSerializerOptions);
+            }
             if (paymentDetails.CompletedAtOption.IsSet)
                 writer.WriteString("completedAt", paymentDetails.CompletedAtOption.Value!.Value.ToString(CompletedAtFormat));
 
-            if (paymentDetails.RefundOption.IsSet)
+            if (paymentDetails.RefundsOption.IsSet)
             {
-                writer.WritePropertyName("refund");
-                JsonSerializer.Serialize(writer, paymentDetails.Refund, jsonSerializerOptions);
+                writer.WritePropertyName("refunds");
+                JsonSerializer.Serialize(writer, paymentDetails.Refunds, jsonSerializerOptions);
             }
         }
     }

@@ -54,6 +54,15 @@ namespace OPayments.SDK.Test.Model
         }
 
         /// <summary>
+        /// Test the property 'RefundId'
+        /// </summary>
+        [Fact]
+        public void RefundIdTest()
+        {
+            // TODO unit test for the property 'RefundId'
+        }
+
+        /// <summary>
         /// Test the property 'PaymentId'
         /// </summary>
         [Fact]
@@ -105,6 +114,24 @@ namespace OPayments.SDK.Test.Model
         public void UpdatedAtTest()
         {
             // TODO unit test for the property 'UpdatedAt'
+        }
+
+        /// <summary>
+        /// Test the property 'ReasonCode'
+        /// </summary>
+        [Fact]
+        public void ReasonCodeTest()
+        {
+            // TODO unit test for the property 'ReasonCode'
+        }
+
+        /// <summary>
+        /// Test the property 'ReasonComment'
+        /// </summary>
+        [Fact]
+        public void ReasonCommentTest()
+        {
+            // TODO unit test for the property 'ReasonComment'
         }
 
         /// <summary>

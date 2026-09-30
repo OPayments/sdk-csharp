@@ -4,12 +4,15 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**RefundId** | **Guid** |  | 
 **PaymentId** | **Guid** |  | 
 **Amount** | **int** | Сумма в копейках. | 
 **Currency** | **string** |  | 
 **Status** | **string** |  | 
 **CreatedAt** | **DateTime** |  | 
 **UpdatedAt** | **DateTime** |  | 
+**ReasonCode** | **RefundReason** |  | [optional] 
+**ReasonComment** | **string** |  | [optional] 
 **Reason** | **string** |  | [optional] 
 **FailureCode** | **string** |  | [optional] 
 **FailureMessage** | **string** |  | [optional] 

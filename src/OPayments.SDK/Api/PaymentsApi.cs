@@ -75,13 +75,17 @@ namespace OPayments.SDK.Api
         /// <param name="amountTo">Не меньше amountFrom, если он передан. (optional)</param>
         /// <param name="createdFrom">Не позже createdTo, если он передан. (optional)</param>
         /// <param name="createdTo">Не раньше createdFrom, если он передан. (optional)</param>
+        /// <param name="completedFrom">Не позже completedTo, если он передан. (optional)</param>
+        /// <param name="completedTo">Не раньше completedFrom, если он передан. (optional)</param>
+        /// <param name="failureCode">Нормализованный код причины платежа. (optional)</param>
+        /// <param name="search">Поиск по paymentId, orderId и описанию платежа. (optional)</param>
         /// <param name="sort"> (optional, default to createdAt)</param>
         /// <param name="sortDirection"> (optional, default to desc)</param>
-        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
         /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="IListPaymentsApiResponse"/>&gt;</returns>
-        Task<IListPaymentsApiResponse> ListPaymentsAsync(Option<string> orderId = default, Option<List<string>> status = default, Option<string> paymentMethod = default, Option<int> amountFrom = default, Option<int> amountTo = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<string> sort = default, Option<string> sortDirection = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default);
+        Task<IListPaymentsApiResponse> ListPaymentsAsync(Option<string> orderId = default, Option<List<string>> status = default, Option<string> paymentMethod = default, Option<int> amountFrom = default, Option<int> amountTo = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<DateTime> completedFrom = default, Option<DateTime> completedTo = default, Option<string> failureCode = default, Option<string> search = default, Option<string> sort = default, Option<string> sortDirection = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Найти платежи
@@ -96,13 +100,17 @@ namespace OPayments.SDK.Api
         /// <param name="amountTo">Не меньше amountFrom, если он передан. (optional)</param>
         /// <param name="createdFrom">Не позже createdTo, если он передан. (optional)</param>
         /// <param name="createdTo">Не раньше createdFrom, если он передан. (optional)</param>
+        /// <param name="completedFrom">Не позже completedTo, если он передан. (optional)</param>
+        /// <param name="completedTo">Не раньше completedFrom, если он передан. (optional)</param>
+        /// <param name="failureCode">Нормализованный код причины платежа. (optional)</param>
+        /// <param name="search">Поиск по paymentId, orderId и описанию платежа. (optional)</param>
         /// <param name="sort"> (optional, default to createdAt)</param>
         /// <param name="sortDirection"> (optional, default to desc)</param>
-        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
         /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="IListPaymentsApiResponse"/>?&gt;</returns>
-        Task<IListPaymentsApiResponse?> ListPaymentsOrDefaultAsync(Option<string> orderId = default, Option<List<string>> status = default, Option<string> paymentMethod = default, Option<int> amountFrom = default, Option<int> amountTo = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<string> sort = default, Option<string> sortDirection = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default);
+        Task<IListPaymentsApiResponse?> ListPaymentsOrDefaultAsync(Option<string> orderId = default, Option<List<string>> status = default, Option<string> paymentMethod = default, Option<int> amountFrom = default, Option<int> amountTo = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<DateTime> completedFrom = default, Option<DateTime> completedTo = default, Option<string> failureCode = default, Option<string> search = default, Option<string> sort = default, Option<string> sortDirection = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default);
     }
 
     /// <summary>
@@ -717,7 +725,7 @@ namespace OPayments.SDK.Api
             partial void OnDeserializationError(ref bool suppressDefaultLog, Exception exception, HttpStatusCode httpStatusCode);
         }
 
-        partial void FormatListPayments(ref Option<string> orderId, Option<List<string>> status, ref Option<string> paymentMethod, ref Option<int> amountFrom, ref Option<int> amountTo, ref Option<DateTime> createdFrom, ref Option<DateTime> createdTo, ref Option<string> sort, ref Option<string> sortDirection, ref Option<string> cursor, ref Option<int> limit);
+        partial void FormatListPayments(ref Option<string> orderId, Option<List<string>> status, ref Option<string> paymentMethod, ref Option<int> amountFrom, ref Option<int> amountTo, ref Option<DateTime> createdFrom, ref Option<DateTime> createdTo, ref Option<DateTime> completedFrom, ref Option<DateTime> completedTo, ref Option<string> failureCode, ref Option<string> search, ref Option<string> sort, ref Option<string> sortDirection, ref Option<string> cursor, ref Option<int> limit);
 
         /// <summary>
         /// Validates the request parameters
@@ -725,11 +733,13 @@ namespace OPayments.SDK.Api
         /// <param name="orderId"></param>
         /// <param name="status"></param>
         /// <param name="paymentMethod"></param>
+        /// <param name="failureCode"></param>
+        /// <param name="search"></param>
         /// <param name="sort"></param>
         /// <param name="sortDirection"></param>
         /// <param name="cursor"></param>
         /// <returns></returns>
-        private void ValidateListPayments(Option<string> orderId, Option<List<string>> status, Option<string> paymentMethod, Option<string> sort, Option<string> sortDirection, Option<string> cursor)
+        private void ValidateListPayments(Option<string> orderId, Option<List<string>> status, Option<string> paymentMethod, Option<string> failureCode, Option<string> search, Option<string> sort, Option<string> sortDirection, Option<string> cursor)
         {
             if (orderId.IsSet && orderId.Value == null)
                 throw new ArgumentNullException(nameof(orderId));
@@ -739,6 +749,12 @@ namespace OPayments.SDK.Api
 
             if (paymentMethod.IsSet && paymentMethod.Value == null)
                 throw new ArgumentNullException(nameof(paymentMethod));
+
+            if (failureCode.IsSet && failureCode.Value == null)
+                throw new ArgumentNullException(nameof(failureCode));
+
+            if (search.IsSet && search.Value == null)
+                throw new ArgumentNullException(nameof(search));
 
             if (sort.IsSet && sort.Value == null)
                 throw new ArgumentNullException(nameof(sort));
@@ -761,14 +777,18 @@ namespace OPayments.SDK.Api
         /// <param name="amountTo"></param>
         /// <param name="createdFrom"></param>
         /// <param name="createdTo"></param>
+        /// <param name="completedFrom"></param>
+        /// <param name="completedTo"></param>
+        /// <param name="failureCode"></param>
+        /// <param name="search"></param>
         /// <param name="sort"></param>
         /// <param name="sortDirection"></param>
         /// <param name="cursor"></param>
         /// <param name="limit"></param>
-        private void AfterListPaymentsDefaultImplementation(IListPaymentsApiResponse apiResponseLocalVar, Option<string> orderId, Option<List<string>> status, Option<string> paymentMethod, Option<int> amountFrom, Option<int> amountTo, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<string> sort, Option<string> sortDirection, Option<string> cursor, Option<int> limit)
+        private void AfterListPaymentsDefaultImplementation(IListPaymentsApiResponse apiResponseLocalVar, Option<string> orderId, Option<List<string>> status, Option<string> paymentMethod, Option<int> amountFrom, Option<int> amountTo, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<DateTime> completedFrom, Option<DateTime> completedTo, Option<string> failureCode, Option<string> search, Option<string> sort, Option<string> sortDirection, Option<string> cursor, Option<int> limit)
         {
             bool suppressDefaultLog = false;
-            AfterListPayments(ref suppressDefaultLog, apiResponseLocalVar, orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, sort, sortDirection, cursor, limit);
+            AfterListPayments(ref suppressDefaultLog, apiResponseLocalVar, orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, completedFrom, completedTo, failureCode, search, sort, sortDirection, cursor, limit);
             if (!suppressDefaultLog)
                 Logger.LogInformation(RestLogEvents.ApiRequestCompleted, "{0,-9} | {1} | {2}", (apiResponseLocalVar.DownloadedAt - apiResponseLocalVar.RequestedAt).TotalSeconds, apiResponseLocalVar.StatusCode, apiResponseLocalVar.Path);
         }
@@ -785,11 +805,15 @@ namespace OPayments.SDK.Api
         /// <param name="amountTo"></param>
         /// <param name="createdFrom"></param>
         /// <param name="createdTo"></param>
+        /// <param name="completedFrom"></param>
+        /// <param name="completedTo"></param>
+        /// <param name="failureCode"></param>
+        /// <param name="search"></param>
         /// <param name="sort"></param>
         /// <param name="sortDirection"></param>
         /// <param name="cursor"></param>
         /// <param name="limit"></param>
-        partial void AfterListPayments(ref bool suppressDefaultLog, IListPaymentsApiResponse apiResponseLocalVar, Option<string> orderId, Option<List<string>> status, Option<string> paymentMethod, Option<int> amountFrom, Option<int> amountTo, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<string> sort, Option<string> sortDirection, Option<string> cursor, Option<int> limit);
+        partial void AfterListPayments(ref bool suppressDefaultLog, IListPaymentsApiResponse apiResponseLocalVar, Option<string> orderId, Option<List<string>> status, Option<string> paymentMethod, Option<int> amountFrom, Option<int> amountTo, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<DateTime> completedFrom, Option<DateTime> completedTo, Option<string> failureCode, Option<string> search, Option<string> sort, Option<string> sortDirection, Option<string> cursor, Option<int> limit);
 
         /// <summary>
         /// Logs exceptions that occur while retrieving the server response
@@ -804,14 +828,18 @@ namespace OPayments.SDK.Api
         /// <param name="amountTo"></param>
         /// <param name="createdFrom"></param>
         /// <param name="createdTo"></param>
+        /// <param name="completedFrom"></param>
+        /// <param name="completedTo"></param>
+        /// <param name="failureCode"></param>
+        /// <param name="search"></param>
         /// <param name="sort"></param>
         /// <param name="sortDirection"></param>
         /// <param name="cursor"></param>
         /// <param name="limit"></param>
-        private void OnErrorListPaymentsDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Option<string> orderId, Option<List<string>> status, Option<string> paymentMethod, Option<int> amountFrom, Option<int> amountTo, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<string> sort, Option<string> sortDirection, Option<string> cursor, Option<int> limit)
+        private void OnErrorListPaymentsDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Option<string> orderId, Option<List<string>> status, Option<string> paymentMethod, Option<int> amountFrom, Option<int> amountTo, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<DateTime> completedFrom, Option<DateTime> completedTo, Option<string> failureCode, Option<string> search, Option<string> sort, Option<string> sortDirection, Option<string> cursor, Option<int> limit)
         {
             bool suppressDefaultLogLocalVar = false;
-            OnErrorListPayments(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, sort, sortDirection, cursor, limit);
+            OnErrorListPayments(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, completedFrom, completedTo, failureCode, search, sort, sortDirection, cursor, limit);
             if (!suppressDefaultLogLocalVar)
                 Logger.LogError(RestLogEvents.ApiRequestFailed, exceptionLocalVar, "An error occurred while sending the request to the server.");
         }
@@ -830,11 +858,15 @@ namespace OPayments.SDK.Api
         /// <param name="amountTo"></param>
         /// <param name="createdFrom"></param>
         /// <param name="createdTo"></param>
+        /// <param name="completedFrom"></param>
+        /// <param name="completedTo"></param>
+        /// <param name="failureCode"></param>
+        /// <param name="search"></param>
         /// <param name="sort"></param>
         /// <param name="sortDirection"></param>
         /// <param name="cursor"></param>
         /// <param name="limit"></param>
-        partial void OnErrorListPayments(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Option<string> orderId, Option<List<string>> status, Option<string> paymentMethod, Option<int> amountFrom, Option<int> amountTo, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<string> sort, Option<string> sortDirection, Option<string> cursor, Option<int> limit);
+        partial void OnErrorListPayments(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Option<string> orderId, Option<List<string>> status, Option<string> paymentMethod, Option<int> amountFrom, Option<int> amountTo, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<DateTime> completedFrom, Option<DateTime> completedTo, Option<string> failureCode, Option<string> search, Option<string> sort, Option<string> sortDirection, Option<string> cursor, Option<int> limit);
 
         /// <summary>
         /// Найти платежи Возвращает список платежей проекта.
@@ -846,17 +878,21 @@ namespace OPayments.SDK.Api
         /// <param name="amountTo">Не меньше amountFrom, если он передан. (optional)</param>
         /// <param name="createdFrom">Не позже createdTo, если он передан. (optional)</param>
         /// <param name="createdTo">Не раньше createdFrom, если он передан. (optional)</param>
+        /// <param name="completedFrom">Не позже completedTo, если он передан. (optional)</param>
+        /// <param name="completedTo">Не раньше completedFrom, если он передан. (optional)</param>
+        /// <param name="failureCode">Нормализованный код причины платежа. (optional)</param>
+        /// <param name="search">Поиск по paymentId, orderId и описанию платежа. (optional)</param>
         /// <param name="sort"> (optional, default to createdAt)</param>
         /// <param name="sortDirection"> (optional, default to desc)</param>
-        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
         /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="IListPaymentsApiResponse"/>&gt;</returns>
-        public async Task<IListPaymentsApiResponse?> ListPaymentsOrDefaultAsync(Option<string> orderId = default, Option<List<string>> status = default, Option<string> paymentMethod = default, Option<int> amountFrom = default, Option<int> amountTo = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<string> sort = default, Option<string> sortDirection = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<IListPaymentsApiResponse?> ListPaymentsOrDefaultAsync(Option<string> orderId = default, Option<List<string>> status = default, Option<string> paymentMethod = default, Option<int> amountFrom = default, Option<int> amountTo = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<DateTime> completedFrom = default, Option<DateTime> completedTo = default, Option<string> failureCode = default, Option<string> search = default, Option<string> sort = default, Option<string> sortDirection = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default)
         {
             try
             {
-                return await ListPaymentsAsync(orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, sort, sortDirection, cursor, limit, cancellationToken).ConfigureAwait(false);
+                return await ListPaymentsAsync(orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, completedFrom, completedTo, failureCode, search, sort, sortDirection, cursor, limit, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -875,21 +911,25 @@ namespace OPayments.SDK.Api
         /// <param name="amountTo">Не меньше amountFrom, если он передан. (optional)</param>
         /// <param name="createdFrom">Не позже createdTo, если он передан. (optional)</param>
         /// <param name="createdTo">Не раньше createdFrom, если он передан. (optional)</param>
+        /// <param name="completedFrom">Не позже completedTo, если он передан. (optional)</param>
+        /// <param name="completedTo">Не раньше completedFrom, если он передан. (optional)</param>
+        /// <param name="failureCode">Нормализованный код причины платежа. (optional)</param>
+        /// <param name="search">Поиск по paymentId, orderId и описанию платежа. (optional)</param>
         /// <param name="sort"> (optional, default to createdAt)</param>
         /// <param name="sortDirection"> (optional, default to desc)</param>
-        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
         /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="IListPaymentsApiResponse"/>&gt;</returns>
-        public async Task<IListPaymentsApiResponse> ListPaymentsAsync(Option<string> orderId = default, Option<List<string>> status = default, Option<string> paymentMethod = default, Option<int> amountFrom = default, Option<int> amountTo = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<string> sort = default, Option<string> sortDirection = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<IListPaymentsApiResponse> ListPaymentsAsync(Option<string> orderId = default, Option<List<string>> status = default, Option<string> paymentMethod = default, Option<int> amountFrom = default, Option<int> amountTo = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<DateTime> completedFrom = default, Option<DateTime> completedTo = default, Option<string> failureCode = default, Option<string> search = default, Option<string> sort = default, Option<string> sortDirection = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default)
         {
             UriBuilder uriBuilderLocalVar = new UriBuilder();
 
             try
             {
-                ValidateListPayments(orderId, status, paymentMethod, sort, sortDirection, cursor);
+                ValidateListPayments(orderId, status, paymentMethod, failureCode, search, sort, sortDirection, cursor);
 
-                FormatListPayments(ref orderId, status, ref paymentMethod, ref amountFrom, ref amountTo, ref createdFrom, ref createdTo, ref sort, ref sortDirection, ref cursor, ref limit);
+                FormatListPayments(ref orderId, status, ref paymentMethod, ref amountFrom, ref amountTo, ref createdFrom, ref createdTo, ref completedFrom, ref completedTo, ref failureCode, ref search, ref sort, ref sortDirection, ref cursor, ref limit);
 
                 using (HttpRequestMessage httpRequestMessageLocalVar = new HttpRequestMessage())
                 {
@@ -922,6 +962,18 @@ namespace OPayments.SDK.Api
 
                     if (createdTo.IsSet)
                         parseQueryStringLocalVar["createdTo"] = ClientUtils.ParameterToString(createdTo.Value);
+
+                    if (completedFrom.IsSet)
+                        parseQueryStringLocalVar["completedFrom"] = ClientUtils.ParameterToString(completedFrom.Value);
+
+                    if (completedTo.IsSet)
+                        parseQueryStringLocalVar["completedTo"] = ClientUtils.ParameterToString(completedTo.Value);
+
+                    if (failureCode.IsSet)
+                        parseQueryStringLocalVar["failureCode"] = ClientUtils.ParameterToString(failureCode.Value);
+
+                    if (search.IsSet)
+                        parseQueryStringLocalVar["search"] = ClientUtils.ParameterToString(search.Value);
 
                     if (sort.IsSet)
                         parseQueryStringLocalVar["sort"] = ClientUtils.ParameterToString(sort.Value);
@@ -974,7 +1026,7 @@ namespace OPayments.SDK.Api
                             }
                         }
 
-                        AfterListPaymentsDefaultImplementation(apiResponseLocalVar, orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, sort, sortDirection, cursor, limit);
+                        AfterListPaymentsDefaultImplementation(apiResponseLocalVar, orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, completedFrom, completedTo, failureCode, search, sort, sortDirection, cursor, limit);
 
                         Events.ExecuteOnListPayments(apiResponseLocalVar);
 
@@ -988,7 +1040,7 @@ namespace OPayments.SDK.Api
             }
             catch(Exception e)
             {
-                OnErrorListPaymentsDefaultImplementation(e, "/payments", uriBuilderLocalVar.Path, orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, sort, sortDirection, cursor, limit);
+                OnErrorListPaymentsDefaultImplementation(e, "/payments", uriBuilderLocalVar.Path, orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, completedFrom, completedTo, failureCode, search, sort, sortDirection, cursor, limit);
                 Events.ExecuteOnErrorListPayments(e);
                 throw;
             }

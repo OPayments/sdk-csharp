@@ -75,11 +75,15 @@ namespace OPayments.SDK.Test.Api
             Client.Option<int> amountTo = default!;
             Client.Option<DateTime> createdFrom = default!;
             Client.Option<DateTime> createdTo = default!;
+            Client.Option<DateTime> completedFrom = default!;
+            Client.Option<DateTime> completedTo = default!;
+            Client.Option<string> failureCode = default!;
+            Client.Option<string> search = default!;
             Client.Option<string> sort = default!;
             Client.Option<string> sortDirection = default!;
             Client.Option<string> cursor = default!;
             Client.Option<int> limit = default!;
-            var response = await _instance.ListPaymentsAsync(orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, sort, sortDirection, cursor, limit);
+            var response = await _instance.ListPaymentsAsync(orderId, status, paymentMethod, amountFrom, amountTo, createdFrom, createdTo, completedFrom, completedTo, failureCode, search, sort, sortDirection, cursor, limit);
             var model = response.Ok();
             Assert.IsType<OPayments.SDK.Model.PaymentList>(model);
         }

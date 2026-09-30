@@ -47,7 +47,7 @@ All URIs are relative to *https://api.opayments.io/api/v1*
 
 <a id="listpayments"></a>
 # **ListPayments**
-> PaymentList ListPayments (string orderId = null, List<string> status = null, string paymentMethod = null, int amountFrom = null, int amountTo = null, DateTime createdFrom = null, DateTime createdTo = null, string sort = null, string sortDirection = null, string cursor = null, int limit = null)
+> PaymentList ListPayments (string orderId = null, List<string> status = null, string paymentMethod = null, int amountFrom = null, int amountTo = null, DateTime createdFrom = null, DateTime createdTo = null, DateTime completedFrom = null, DateTime completedTo = null, string failureCode = null, string search = null, string sort = null, string sortDirection = null, string cursor = null, int limit = null)
 
 Найти платежи
 
@@ -65,9 +65,13 @@ All URIs are relative to *https://api.opayments.io/api/v1*
 | **amountTo** | **int** | Не меньше amountFrom, если он передан. | [optional]  |
 | **createdFrom** | **DateTime** | Не позже createdTo, если он передан. | [optional]  |
 | **createdTo** | **DateTime** | Не раньше createdFrom, если он передан. | [optional]  |
+| **completedFrom** | **DateTime** | Не позже completedTo, если он передан. | [optional]  |
+| **completedTo** | **DateTime** | Не раньше completedFrom, если он передан. | [optional]  |
+| **failureCode** | **string** | Нормализованный код причины платежа. | [optional]  |
+| **search** | **string** | Поиск по paymentId, orderId и описанию платежа. | [optional]  |
 | **sort** | **string** |  | [optional] [default to createdAt] |
 | **sortDirection** | **string** |  | [optional] [default to desc] |
-| **cursor** | **string** | Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. | [optional]  |
+| **cursor** | **string** | Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. | [optional]  |
 | **limit** | **int** | Количество записей в ответе. | [optional] [default to 20] |
 
 ### Return type

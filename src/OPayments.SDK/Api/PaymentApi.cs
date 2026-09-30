@@ -46,9 +46,10 @@ namespace OPayments.SDK.Api
         /// </remarks>
         /// <exception cref="ApiException">Thrown when fails to make API call</exception>
         /// <param name="createSbpPaymentRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreateSbpPaymentApiResponse"/>&gt;</returns>
-        Task<ICreateSbpPaymentApiResponse> CreateSbpPaymentAsync(CreateSbpPaymentRequest createSbpPaymentRequest, System.Threading.CancellationToken cancellationToken = default);
+        Task<ICreateSbpPaymentApiResponse> CreateSbpPaymentAsync(CreateSbpPaymentRequest createSbpPaymentRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Создать платёж по СБП
@@ -57,9 +58,10 @@ namespace OPayments.SDK.Api
         /// 
         /// </remarks>
         /// <param name="createSbpPaymentRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreateSbpPaymentApiResponse"/>?&gt;</returns>
-        Task<ICreateSbpPaymentApiResponse?> CreateSbpPaymentOrDefaultAsync(CreateSbpPaymentRequest createSbpPaymentRequest, System.Threading.CancellationToken cancellationToken = default);
+        Task<ICreateSbpPaymentApiResponse?> CreateSbpPaymentOrDefaultAsync(CreateSbpPaymentRequest createSbpPaymentRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Создать платёж через T-Pay
@@ -69,9 +71,10 @@ namespace OPayments.SDK.Api
         /// </remarks>
         /// <exception cref="ApiException">Thrown when fails to make API call</exception>
         /// <param name="createTpayPaymentRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreateTpayPaymentApiResponse"/>&gt;</returns>
-        Task<ICreateTpayPaymentApiResponse> CreateTpayPaymentAsync(CreateTpayPaymentRequest createTpayPaymentRequest, System.Threading.CancellationToken cancellationToken = default);
+        Task<ICreateTpayPaymentApiResponse> CreateTpayPaymentAsync(CreateTpayPaymentRequest createTpayPaymentRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Создать платёж через T-Pay
@@ -80,9 +83,10 @@ namespace OPayments.SDK.Api
         /// 
         /// </remarks>
         /// <param name="createTpayPaymentRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreateTpayPaymentApiResponse"/>?&gt;</returns>
-        Task<ICreateTpayPaymentApiResponse?> CreateTpayPaymentOrDefaultAsync(CreateTpayPaymentRequest createTpayPaymentRequest, System.Threading.CancellationToken cancellationToken = default);
+        Task<ICreateTpayPaymentApiResponse?> CreateTpayPaymentOrDefaultAsync(CreateTpayPaymentRequest createTpayPaymentRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default);
     }
 
     /// <summary>
@@ -316,17 +320,21 @@ namespace OPayments.SDK.Api
             ApiKeyProvider = apiKeyProvider;
         }
 
-        partial void FormatCreateSbpPayment(CreateSbpPaymentRequest createSbpPaymentRequest);
+        partial void FormatCreateSbpPayment(CreateSbpPaymentRequest createSbpPaymentRequest, ref Option<string> idempotencyKey);
 
         /// <summary>
         /// Validates the request parameters
         /// </summary>
         /// <param name="createSbpPaymentRequest"></param>
+        /// <param name="idempotencyKey"></param>
         /// <returns></returns>
-        private void ValidateCreateSbpPayment(CreateSbpPaymentRequest createSbpPaymentRequest)
+        private void ValidateCreateSbpPayment(CreateSbpPaymentRequest createSbpPaymentRequest, Option<string> idempotencyKey)
         {
             if (createSbpPaymentRequest == null)
                 throw new ArgumentNullException(nameof(createSbpPaymentRequest));
+
+            if (idempotencyKey.IsSet && idempotencyKey.Value == null)
+                throw new ArgumentNullException(nameof(idempotencyKey));
         }
 
         /// <summary>
@@ -334,10 +342,11 @@ namespace OPayments.SDK.Api
         /// </summary>
         /// <param name="apiResponseLocalVar"></param>
         /// <param name="createSbpPaymentRequest"></param>
-        private void AfterCreateSbpPaymentDefaultImplementation(ICreateSbpPaymentApiResponse apiResponseLocalVar, CreateSbpPaymentRequest createSbpPaymentRequest)
+        /// <param name="idempotencyKey"></param>
+        private void AfterCreateSbpPaymentDefaultImplementation(ICreateSbpPaymentApiResponse apiResponseLocalVar, CreateSbpPaymentRequest createSbpPaymentRequest, Option<string> idempotencyKey)
         {
             bool suppressDefaultLog = false;
-            AfterCreateSbpPayment(ref suppressDefaultLog, apiResponseLocalVar, createSbpPaymentRequest);
+            AfterCreateSbpPayment(ref suppressDefaultLog, apiResponseLocalVar, createSbpPaymentRequest, idempotencyKey);
             if (!suppressDefaultLog)
                 Logger.LogInformation(RestLogEvents.ApiRequestCompleted, "{0,-9} | {1} | {2}", (apiResponseLocalVar.DownloadedAt - apiResponseLocalVar.RequestedAt).TotalSeconds, apiResponseLocalVar.StatusCode, apiResponseLocalVar.Path);
         }
@@ -348,7 +357,8 @@ namespace OPayments.SDK.Api
         /// <param name="suppressDefaultLog"></param>
         /// <param name="apiResponseLocalVar"></param>
         /// <param name="createSbpPaymentRequest"></param>
-        partial void AfterCreateSbpPayment(ref bool suppressDefaultLog, ICreateSbpPaymentApiResponse apiResponseLocalVar, CreateSbpPaymentRequest createSbpPaymentRequest);
+        /// <param name="idempotencyKey"></param>
+        partial void AfterCreateSbpPayment(ref bool suppressDefaultLog, ICreateSbpPaymentApiResponse apiResponseLocalVar, CreateSbpPaymentRequest createSbpPaymentRequest, Option<string> idempotencyKey);
 
         /// <summary>
         /// Logs exceptions that occur while retrieving the server response
@@ -357,10 +367,11 @@ namespace OPayments.SDK.Api
         /// <param name="pathFormatLocalVar"></param>
         /// <param name="pathLocalVar"></param>
         /// <param name="createSbpPaymentRequest"></param>
-        private void OnErrorCreateSbpPaymentDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, CreateSbpPaymentRequest createSbpPaymentRequest)
+        /// <param name="idempotencyKey"></param>
+        private void OnErrorCreateSbpPaymentDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, CreateSbpPaymentRequest createSbpPaymentRequest, Option<string> idempotencyKey)
         {
             bool suppressDefaultLogLocalVar = false;
-            OnErrorCreateSbpPayment(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, createSbpPaymentRequest);
+            OnErrorCreateSbpPayment(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, createSbpPaymentRequest, idempotencyKey);
             if (!suppressDefaultLogLocalVar)
                 Logger.LogError(RestLogEvents.ApiRequestFailed, exceptionLocalVar, "An error occurred while sending the request to the server.");
         }
@@ -373,19 +384,21 @@ namespace OPayments.SDK.Api
         /// <param name="pathFormatLocalVar"></param>
         /// <param name="pathLocalVar"></param>
         /// <param name="createSbpPaymentRequest"></param>
-        partial void OnErrorCreateSbpPayment(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, CreateSbpPaymentRequest createSbpPaymentRequest);
+        /// <param name="idempotencyKey"></param>
+        partial void OnErrorCreateSbpPayment(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, CreateSbpPaymentRequest createSbpPaymentRequest, Option<string> idempotencyKey);
 
         /// <summary>
         /// Создать платёж по СБП 
         /// </summary>
         /// <param name="createSbpPaymentRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreateSbpPaymentApiResponse"/>&gt;</returns>
-        public async Task<ICreateSbpPaymentApiResponse?> CreateSbpPaymentOrDefaultAsync(CreateSbpPaymentRequest createSbpPaymentRequest, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ICreateSbpPaymentApiResponse?> CreateSbpPaymentOrDefaultAsync(CreateSbpPaymentRequest createSbpPaymentRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default)
         {
             try
             {
-                return await CreateSbpPaymentAsync(createSbpPaymentRequest, cancellationToken).ConfigureAwait(false);
+                return await CreateSbpPaymentAsync(createSbpPaymentRequest, idempotencyKey, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -398,17 +411,18 @@ namespace OPayments.SDK.Api
         /// </summary>
         /// <exception cref="ApiException">Thrown when fails to make API call</exception>
         /// <param name="createSbpPaymentRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreateSbpPaymentApiResponse"/>&gt;</returns>
-        public async Task<ICreateSbpPaymentApiResponse> CreateSbpPaymentAsync(CreateSbpPaymentRequest createSbpPaymentRequest, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ICreateSbpPaymentApiResponse> CreateSbpPaymentAsync(CreateSbpPaymentRequest createSbpPaymentRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default)
         {
             UriBuilder uriBuilderLocalVar = new UriBuilder();
 
             try
             {
-                ValidateCreateSbpPayment(createSbpPaymentRequest);
+                ValidateCreateSbpPayment(createSbpPaymentRequest, idempotencyKey);
 
-                FormatCreateSbpPayment(createSbpPaymentRequest);
+                FormatCreateSbpPayment(createSbpPaymentRequest, ref idempotencyKey);
 
                 using (HttpRequestMessage httpRequestMessageLocalVar = new HttpRequestMessage())
                 {
@@ -422,6 +436,19 @@ namespace OPayments.SDK.Api
                     httpRequestMessageLocalVar.Content = (createSbpPaymentRequest as object) is OPayments.SDK.Client.FileParameter fileParameterLocalVar
                         ? httpRequestMessageLocalVar.Content = new StreamContent(fileParameterLocalVar.Content)
                         : httpRequestMessageLocalVar.Content = new StringContent(JsonSerializer.Serialize(createSbpPaymentRequest, _jsonSerializerOptions));
+
+                    if (idempotencyKey.IsSet)
+                    {
+                      // Set client side default value of Header Param "Idempotency-Key".                    
+                      if (ClientUtils.IsContentHeader("Idempotency-Key"))
+                      {
+                          httpRequestMessageLocalVar.Content?.Headers.Add("Idempotency-Key", ClientUtils.ParameterToString(idempotencyKey.Value));
+                      }
+                      else
+                      {
+                          httpRequestMessageLocalVar.Headers.Add("Idempotency-Key", ClientUtils.ParameterToString(idempotencyKey.Value));
+                      }
+                    }
 
                     List<TokenBase> tokenBaseLocalVars = new List<TokenBase>();
                     ApiKeyToken apiKeyTokenLocalVar1 = (ApiKeyToken) await ApiKeyProvider.GetAsync("X-Signature", cancellationToken).ConfigureAwait(false);
@@ -469,7 +496,7 @@ namespace OPayments.SDK.Api
                             }
                         }
 
-                        AfterCreateSbpPaymentDefaultImplementation(apiResponseLocalVar, createSbpPaymentRequest);
+                        AfterCreateSbpPaymentDefaultImplementation(apiResponseLocalVar, createSbpPaymentRequest, idempotencyKey);
 
                         Events.ExecuteOnCreateSbpPayment(apiResponseLocalVar);
 
@@ -483,7 +510,7 @@ namespace OPayments.SDK.Api
             }
             catch(Exception e)
             {
-                OnErrorCreateSbpPaymentDefaultImplementation(e, "/payments/sbp", uriBuilderLocalVar.Path, createSbpPaymentRequest);
+                OnErrorCreateSbpPaymentDefaultImplementation(e, "/payments/sbp", uriBuilderLocalVar.Path, createSbpPaymentRequest, idempotencyKey);
                 Events.ExecuteOnErrorCreateSbpPayment(e);
                 throw;
             }
@@ -1094,17 +1121,21 @@ namespace OPayments.SDK.Api
             partial void OnDeserializationError(ref bool suppressDefaultLog, Exception exception, HttpStatusCode httpStatusCode);
         }
 
-        partial void FormatCreateTpayPayment(CreateTpayPaymentRequest createTpayPaymentRequest);
+        partial void FormatCreateTpayPayment(CreateTpayPaymentRequest createTpayPaymentRequest, ref Option<string> idempotencyKey);
 
         /// <summary>
         /// Validates the request parameters
         /// </summary>
         /// <param name="createTpayPaymentRequest"></param>
+        /// <param name="idempotencyKey"></param>
         /// <returns></returns>
-        private void ValidateCreateTpayPayment(CreateTpayPaymentRequest createTpayPaymentRequest)
+        private void ValidateCreateTpayPayment(CreateTpayPaymentRequest createTpayPaymentRequest, Option<string> idempotencyKey)
         {
             if (createTpayPaymentRequest == null)
                 throw new ArgumentNullException(nameof(createTpayPaymentRequest));
+
+            if (idempotencyKey.IsSet && idempotencyKey.Value == null)
+                throw new ArgumentNullException(nameof(idempotencyKey));
         }
 
         /// <summary>
@@ -1112,10 +1143,11 @@ namespace OPayments.SDK.Api
         /// </summary>
         /// <param name="apiResponseLocalVar"></param>
         /// <param name="createTpayPaymentRequest"></param>
-        private void AfterCreateTpayPaymentDefaultImplementation(ICreateTpayPaymentApiResponse apiResponseLocalVar, CreateTpayPaymentRequest createTpayPaymentRequest)
+        /// <param name="idempotencyKey"></param>
+        private void AfterCreateTpayPaymentDefaultImplementation(ICreateTpayPaymentApiResponse apiResponseLocalVar, CreateTpayPaymentRequest createTpayPaymentRequest, Option<string> idempotencyKey)
         {
             bool suppressDefaultLog = false;
-            AfterCreateTpayPayment(ref suppressDefaultLog, apiResponseLocalVar, createTpayPaymentRequest);
+            AfterCreateTpayPayment(ref suppressDefaultLog, apiResponseLocalVar, createTpayPaymentRequest, idempotencyKey);
             if (!suppressDefaultLog)
                 Logger.LogInformation(RestLogEvents.ApiRequestCompleted, "{0,-9} | {1} | {2}", (apiResponseLocalVar.DownloadedAt - apiResponseLocalVar.RequestedAt).TotalSeconds, apiResponseLocalVar.StatusCode, apiResponseLocalVar.Path);
         }
@@ -1126,7 +1158,8 @@ namespace OPayments.SDK.Api
         /// <param name="suppressDefaultLog"></param>
         /// <param name="apiResponseLocalVar"></param>
         /// <param name="createTpayPaymentRequest"></param>
-        partial void AfterCreateTpayPayment(ref bool suppressDefaultLog, ICreateTpayPaymentApiResponse apiResponseLocalVar, CreateTpayPaymentRequest createTpayPaymentRequest);
+        /// <param name="idempotencyKey"></param>
+        partial void AfterCreateTpayPayment(ref bool suppressDefaultLog, ICreateTpayPaymentApiResponse apiResponseLocalVar, CreateTpayPaymentRequest createTpayPaymentRequest, Option<string> idempotencyKey);
 
         /// <summary>
         /// Logs exceptions that occur while retrieving the server response
@@ -1135,10 +1168,11 @@ namespace OPayments.SDK.Api
         /// <param name="pathFormatLocalVar"></param>
         /// <param name="pathLocalVar"></param>
         /// <param name="createTpayPaymentRequest"></param>
-        private void OnErrorCreateTpayPaymentDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, CreateTpayPaymentRequest createTpayPaymentRequest)
+        /// <param name="idempotencyKey"></param>
+        private void OnErrorCreateTpayPaymentDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, CreateTpayPaymentRequest createTpayPaymentRequest, Option<string> idempotencyKey)
         {
             bool suppressDefaultLogLocalVar = false;
-            OnErrorCreateTpayPayment(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, createTpayPaymentRequest);
+            OnErrorCreateTpayPayment(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, createTpayPaymentRequest, idempotencyKey);
             if (!suppressDefaultLogLocalVar)
                 Logger.LogError(RestLogEvents.ApiRequestFailed, exceptionLocalVar, "An error occurred while sending the request to the server.");
         }
@@ -1151,19 +1185,21 @@ namespace OPayments.SDK.Api
         /// <param name="pathFormatLocalVar"></param>
         /// <param name="pathLocalVar"></param>
         /// <param name="createTpayPaymentRequest"></param>
-        partial void OnErrorCreateTpayPayment(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, CreateTpayPaymentRequest createTpayPaymentRequest);
+        /// <param name="idempotencyKey"></param>
+        partial void OnErrorCreateTpayPayment(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, CreateTpayPaymentRequest createTpayPaymentRequest, Option<string> idempotencyKey);
 
         /// <summary>
         /// Создать платёж через T-Pay 
         /// </summary>
         /// <param name="createTpayPaymentRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreateTpayPaymentApiResponse"/>&gt;</returns>
-        public async Task<ICreateTpayPaymentApiResponse?> CreateTpayPaymentOrDefaultAsync(CreateTpayPaymentRequest createTpayPaymentRequest, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ICreateTpayPaymentApiResponse?> CreateTpayPaymentOrDefaultAsync(CreateTpayPaymentRequest createTpayPaymentRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default)
         {
             try
             {
-                return await CreateTpayPaymentAsync(createTpayPaymentRequest, cancellationToken).ConfigureAwait(false);
+                return await CreateTpayPaymentAsync(createTpayPaymentRequest, idempotencyKey, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -1176,17 +1212,18 @@ namespace OPayments.SDK.Api
         /// </summary>
         /// <exception cref="ApiException">Thrown when fails to make API call</exception>
         /// <param name="createTpayPaymentRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreateTpayPaymentApiResponse"/>&gt;</returns>
-        public async Task<ICreateTpayPaymentApiResponse> CreateTpayPaymentAsync(CreateTpayPaymentRequest createTpayPaymentRequest, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ICreateTpayPaymentApiResponse> CreateTpayPaymentAsync(CreateTpayPaymentRequest createTpayPaymentRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default)
         {
             UriBuilder uriBuilderLocalVar = new UriBuilder();
 
             try
             {
-                ValidateCreateTpayPayment(createTpayPaymentRequest);
+                ValidateCreateTpayPayment(createTpayPaymentRequest, idempotencyKey);
 
-                FormatCreateTpayPayment(createTpayPaymentRequest);
+                FormatCreateTpayPayment(createTpayPaymentRequest, ref idempotencyKey);
 
                 using (HttpRequestMessage httpRequestMessageLocalVar = new HttpRequestMessage())
                 {
@@ -1200,6 +1237,19 @@ namespace OPayments.SDK.Api
                     httpRequestMessageLocalVar.Content = (createTpayPaymentRequest as object) is OPayments.SDK.Client.FileParameter fileParameterLocalVar
                         ? httpRequestMessageLocalVar.Content = new StreamContent(fileParameterLocalVar.Content)
                         : httpRequestMessageLocalVar.Content = new StringContent(JsonSerializer.Serialize(createTpayPaymentRequest, _jsonSerializerOptions));
+
+                    if (idempotencyKey.IsSet)
+                    {
+                      // Set client side default value of Header Param "Idempotency-Key".                    
+                      if (ClientUtils.IsContentHeader("Idempotency-Key"))
+                      {
+                          httpRequestMessageLocalVar.Content?.Headers.Add("Idempotency-Key", ClientUtils.ParameterToString(idempotencyKey.Value));
+                      }
+                      else
+                      {
+                          httpRequestMessageLocalVar.Headers.Add("Idempotency-Key", ClientUtils.ParameterToString(idempotencyKey.Value));
+                      }
+                    }
 
                     List<TokenBase> tokenBaseLocalVars = new List<TokenBase>();
                     ApiKeyToken apiKeyTokenLocalVar1 = (ApiKeyToken) await ApiKeyProvider.GetAsync("X-Signature", cancellationToken).ConfigureAwait(false);
@@ -1247,7 +1297,7 @@ namespace OPayments.SDK.Api
                             }
                         }
 
-                        AfterCreateTpayPaymentDefaultImplementation(apiResponseLocalVar, createTpayPaymentRequest);
+                        AfterCreateTpayPaymentDefaultImplementation(apiResponseLocalVar, createTpayPaymentRequest, idempotencyKey);
 
                         Events.ExecuteOnCreateTpayPayment(apiResponseLocalVar);
 
@@ -1261,7 +1311,7 @@ namespace OPayments.SDK.Api
             }
             catch(Exception e)
             {
-                OnErrorCreateTpayPaymentDefaultImplementation(e, "/payments/tpay", uriBuilderLocalVar.Path, createTpayPaymentRequest);
+                OnErrorCreateTpayPaymentDefaultImplementation(e, "/payments/tpay", uriBuilderLocalVar.Path, createTpayPaymentRequest, idempotencyKey);
                 Events.ExecuteOnErrorCreateTpayPayment(e);
                 throw;
             }

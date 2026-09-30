@@ -34,16 +34,33 @@ namespace OPayments.SDK.Model
         /// Initializes a new instance of the <see cref="CreateRefundRequest" /> class.
         /// </summary>
         /// <param name="amount">Сумма в копейках.</param>
-        /// <param name="reason">reason</param>
+        /// <param name="reasonCode">reasonCode</param>
+        /// <param name="reasonComment">reasonComment</param>
+        /// <param name="reason">Устаревшее произвольное описание причины. Новые клиенты используют reasonCode и опционально reasonComment.</param>
         [JsonConstructor]
-        public CreateRefundRequest(Option<int?> amount = default, Option<string?> reason = default)
+        public CreateRefundRequest(Option<int?> amount = default, Option<RefundReason?> reasonCode = default, Option<string?> reasonComment = default, Option<string?> reason = default)
         {
             AmountOption = amount;
+            ReasonCodeOption = reasonCode;
+            ReasonCommentOption = reasonComment;
             ReasonOption = reason;
             OnCreated();
         }
 
         partial void OnCreated();
+
+        /// <summary>
+        /// Used to track the state of ReasonCode
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<RefundReason?> ReasonCodeOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets ReasonCode
+        /// </summary>
+        [JsonPropertyName("reasonCode")]
+        public RefundReason? ReasonCode { get { return this.ReasonCodeOption.Value; } set { this.ReasonCodeOption = new(value); } }
 
         /// <summary>
         /// Used to track the state of Amount
@@ -60,6 +77,19 @@ namespace OPayments.SDK.Model
         public int? Amount { get { return this.AmountOption.Value; } set { this.AmountOption = new(value); } }
 
         /// <summary>
+        /// Used to track the state of ReasonComment
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<string?> ReasonCommentOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets ReasonComment
+        /// </summary>
+        [JsonPropertyName("reasonComment")]
+        public string? ReasonComment { get { return this.ReasonCommentOption.Value; } set { this.ReasonCommentOption = new(value); } }
+
+        /// <summary>
         /// Used to track the state of Reason
         /// </summary>
         [JsonIgnore]
@@ -67,9 +97,11 @@ namespace OPayments.SDK.Model
         public Option<string?> ReasonOption { get; private set; }
 
         /// <summary>
-        /// Gets or Sets Reason
+        /// Устаревшее произвольное описание причины. Новые клиенты используют reasonCode и опционально reasonComment.
         /// </summary>
+        /// <value>Устаревшее произвольное описание причины. Новые клиенты используют reasonCode и опционально reasonComment.</value>
         [JsonPropertyName("reason")]
+        [Obsolete]
         public string? Reason { get { return this.ReasonOption.Value; } set { this.ReasonOption = new(value); } }
 
         /// <summary>
@@ -81,6 +113,8 @@ namespace OPayments.SDK.Model
             StringBuilder sb = new StringBuilder();
             sb.Append("class CreateRefundRequest {\n");
             sb.Append("  Amount: ").Append(Amount).Append("\n");
+            sb.Append("  ReasonCode: ").Append(ReasonCode).Append("\n");
+            sb.Append("  ReasonComment: ").Append(ReasonComment).Append("\n");
             sb.Append("  Reason: ").Append(Reason).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
@@ -97,6 +131,12 @@ namespace OPayments.SDK.Model
             if (this.AmountOption.IsSet && this.AmountOption.Value < (int)1)
             {
                 yield return new ValidationResult("Invalid value for Amount, must be a value greater than or equal to 1.", new [] { "Amount" });
+            }
+
+            // ReasonComment (string) maxLength
+            if (this.ReasonComment != null && this.ReasonComment.Length > 255)
+            {
+                yield return new ValidationResult("Invalid value for ReasonComment, length must be less than 255.", new [] { "ReasonComment" });
             }
 
             // Reason (string) maxLength
@@ -142,6 +182,8 @@ namespace OPayments.SDK.Model
             JsonTokenType startingTokenType = utf8JsonReader.TokenType;
 
             Option<int?> amount = default;
+            Option<RefundReason?> reasonCode = default;
+            Option<string?> reasonComment = default;
             Option<string?> reason = default;
 
             while (utf8JsonReader.Read())
@@ -162,6 +204,12 @@ namespace OPayments.SDK.Model
                         case "amount":
                             amount = new Option<int?>(utf8JsonReader.TokenType == JsonTokenType.Null ? (int?)null : utf8JsonReader.GetInt32());
                             break;
+                        case "reasonCode":
+                            reasonCode = new Option<RefundReason?>(JsonSerializer.Deserialize<RefundReason?>(ref utf8JsonReader, jsonSerializerOptions));
+                            break;
+                        case "reasonComment":
+                            reasonComment = new Option<string?>(utf8JsonReader.GetString()!);
+                            break;
                         case "reason":
                             reason = new Option<string?>(utf8JsonReader.GetString()!);
                             break;
@@ -174,10 +222,16 @@ namespace OPayments.SDK.Model
             if (amount.IsSet && amount.Value == null)
                 throw new ArgumentNullException(nameof(amount), "Property is not nullable for class CreateRefundRequest.");
 
+            if (reasonCode.IsSet && reasonCode.Value == null)
+                throw new ArgumentNullException(nameof(reasonCode), "Property is not nullable for class CreateRefundRequest.");
+
+            if (reasonComment.IsSet && reasonComment.Value == null)
+                throw new ArgumentNullException(nameof(reasonComment), "Property is not nullable for class CreateRefundRequest.");
+
             if (reason.IsSet && reason.Value == null)
                 throw new ArgumentNullException(nameof(reason), "Property is not nullable for class CreateRefundRequest.");
 
-            return new CreateRefundRequest(amount, reason);
+            return new CreateRefundRequest(amount, reasonCode, reasonComment, reason);
         }
 
         /// <summary>
@@ -204,11 +258,22 @@ namespace OPayments.SDK.Model
         /// <exception cref="NotImplementedException"></exception>
         public void WriteProperties(Utf8JsonWriter writer, CreateRefundRequest createRefundRequest, JsonSerializerOptions jsonSerializerOptions)
         {
+            if (createRefundRequest.ReasonCommentOption.IsSet && createRefundRequest.ReasonComment == null)
+                throw new ArgumentNullException(nameof(createRefundRequest.ReasonComment), "Property is required for class CreateRefundRequest.");
+
             if (createRefundRequest.ReasonOption.IsSet && createRefundRequest.Reason == null)
                 throw new ArgumentNullException(nameof(createRefundRequest.Reason), "Property is required for class CreateRefundRequest.");
 
             if (createRefundRequest.AmountOption.IsSet)
                 writer.WriteNumber("amount", createRefundRequest.AmountOption.Value!.Value);
+
+            if (createRefundRequest.ReasonCodeOption.IsSet)
+            {
+                var reasonCodeRawValue = RefundReasonValueConverter.ToJsonValue(createRefundRequest.ReasonCode!.Value);
+                writer.WriteString("reasonCode", reasonCodeRawValue);
+            }
+            if (createRefundRequest.ReasonCommentOption.IsSet)
+                writer.WriteString("reasonComment", createRefundRequest.ReasonComment);
 
             if (createRefundRequest.ReasonOption.IsSet)
                 writer.WriteString("reason", createRefundRequest.Reason);

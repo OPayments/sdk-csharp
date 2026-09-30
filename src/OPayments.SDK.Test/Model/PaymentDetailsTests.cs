@@ -144,15 +144,6 @@ namespace OPayments.SDK.Test.Model
         }
 
         /// <summary>
-        /// Test the property 'ExpiresAt'
-        /// </summary>
-        [Fact]
-        public void ExpiresAtTest()
-        {
-            // TODO unit test for the property 'ExpiresAt'
-        }
-
-        /// <summary>
         /// Test the property 'FailureCode'
         /// </summary>
         [Fact]
@@ -171,6 +162,15 @@ namespace OPayments.SDK.Test.Model
         }
 
         /// <summary>
+        /// Test the property 'RefundSummary'
+        /// </summary>
+        [Fact]
+        public void RefundSummaryTest()
+        {
+            // TODO unit test for the property 'RefundSummary'
+        }
+
+        /// <summary>
         /// Test the property 'CompletedAt'
         /// </summary>
         [Fact]
@@ -180,12 +180,12 @@ namespace OPayments.SDK.Test.Model
         }
 
         /// <summary>
-        /// Test the property 'Refund'
+        /// Test the property 'Refunds'
         /// </summary>
         [Fact]
-        public void RefundTest()
+        public void RefundsTest()
         {
-            // TODO unit test for the property 'Refund'
+            // TODO unit test for the property 'Refunds'
         }
     }
 }

@@ -14,11 +14,11 @@ Name | Type | Description | Notes
 **UpdatedAt** | **DateTime** |  | 
 **Description** | **string** |  | [optional] 
 **PaymentUrl** | **string** | Адрес оплаты для платежа в статусе pending. | [optional] 
-**ExpiresAt** | **DateTime** |  | [optional] 
 **FailureCode** | **string** |  | [optional] 
-**FailureMessage** | **string** |  | [optional] 
+**FailureMessage** | **string** | Нормализованное сообщение, безопасное для показа мерчанту; никогда не содержит сырой ответ провайдера, credentials или данные карты. | [optional] 
+**RefundSummary** | [**RefundSummary**](RefundSummary.md) |  | [optional] 
 **CompletedAt** | **DateTime** |  | [optional] 
-**Refund** | [**Refund**](Refund.md) |  | [optional] 
+**Refunds** | [**List&lt;Refund&gt;**](Refund.md) | Устарело, так как список неограничен. Используйте GET /payments/{paymentId}/refunds. | [optional] 
 
 [[Back to Model list]](../../README.md#documentation-for-models) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to README]](../../README.md)
 

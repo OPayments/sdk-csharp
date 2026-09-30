@@ -72,21 +72,12 @@ namespace OPayments.SDK.Test.Model
         }
 
         /// <summary>
-        /// Test the property 'Currency'
+        /// Test the property 'Metadata'
         /// </summary>
         [Fact]
-        public void CurrencyTest()
+        public void MetadataTest()
         {
-            // TODO unit test for the property 'Currency'
-        }
-
-        /// <summary>
-        /// Test the property 'Ip'
-        /// </summary>
-        [Fact]
-        public void IpTest()
-        {
-            // TODO unit test for the property 'Ip'
+            // TODO unit test for the property 'Metadata'
         }
 
         /// <summary>
@@ -114,15 +105,6 @@ namespace OPayments.SDK.Test.Model
         public void FailedUrlTest()
         {
             // TODO unit test for the property 'FailedUrl'
-        }
-
-        /// <summary>
-        /// Test the property 'DeviceData'
-        /// </summary>
-        [Fact]
-        public void DeviceDataTest()
-        {
-            // TODO unit test for the property 'DeviceData'
         }
 
         /// <summary>

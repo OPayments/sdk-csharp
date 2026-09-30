@@ -35,87 +35,25 @@ namespace OPayments.SDK.Model
         /// </summary>
         /// <param name="orderId">Идентификатор заказа в системе мерчанта.</param>
         /// <param name="amount">Сумма в копейках.</param>
-        /// <param name="currency">currency</param>
-        /// <param name="ip">IP-адрес плательщика: IPv4 или IPv6.</param>
-        /// <param name="callbackUrl">HTTPS-адрес уведомлений.</param>
+        /// <param name="metadata">metadata</param>
+        /// <param name="callbackUrl">HTTPS-адрес для уведомлений о платеже.</param>
         /// <param name="successUrl">HTTPS-адрес для успешной оплаты.</param>
         /// <param name="failedUrl">HTTPS-адрес для отменённой оплаты.</param>
-        /// <param name="deviceData">deviceData</param>
         /// <param name="description">description</param>
         [JsonConstructor]
-        public CreateTpayPaymentRequest(string orderId, int amount, CurrencyEnum currency, string ip, string callbackUrl, string successUrl, string failedUrl, TpayDeviceData deviceData, Option<string?> description = default)
+        public CreateTpayPaymentRequest(string orderId, int amount, TpayPaymentMetadata metadata, string callbackUrl, string successUrl, string failedUrl, Option<string?> description = default)
         {
             OrderId = orderId;
             Amount = amount;
-            Currency = currency;
-            Ip = ip;
+            Metadata = metadata;
             CallbackUrl = callbackUrl;
             SuccessUrl = successUrl;
             FailedUrl = failedUrl;
-            DeviceData = deviceData;
             DescriptionOption = description;
             OnCreated();
         }
 
         partial void OnCreated();
-
-        /// <summary>
-        /// Defines Currency
-        /// </summary>
-        public enum CurrencyEnum
-        {
-            /// <summary>
-            /// Enum RUB for value: RUB
-            /// </summary>
-            RUB = 1
-        }
-
-        /// <summary>
-        /// Returns a <see cref="CurrencyEnum"/>
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public static CurrencyEnum CurrencyEnumFromString(string value)
-        {
-            if (value.Equals("RUB"))
-                return CurrencyEnum.RUB;
-
-            throw new NotImplementedException($"Could not convert value to type CurrencyEnum: '{value}'");
-        }
-
-        /// <summary>
-        /// Returns a <see cref="CurrencyEnum"/>
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static CurrencyEnum? CurrencyEnumFromStringOrDefault(string value)
-        {
-            if (value.Equals("RUB"))
-                return CurrencyEnum.RUB;
-
-            return null;
-        }
-
-        /// <summary>
-        /// Converts the <see cref="CurrencyEnum"/> to the json value
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public static string CurrencyEnumToJsonValue(CurrencyEnum value)
-        {
-            if (value == CurrencyEnum.RUB)
-                return "RUB";
-
-            throw new NotImplementedException($"Value could not be handled: '{value}'");
-        }
-
-        /// <summary>
-        /// Gets or Sets Currency
-        /// </summary>
-        [JsonPropertyName("currency")]
-        public CurrencyEnum Currency { get; set; }
 
         /// <summary>
         /// Идентификатор заказа в системе мерчанта.
@@ -132,16 +70,15 @@ namespace OPayments.SDK.Model
         public int Amount { get; set; }
 
         /// <summary>
-        /// IP-адрес плательщика: IPv4 или IPv6.
+        /// Gets or Sets Metadata
         /// </summary>
-        /// <value>IP-адрес плательщика: IPv4 или IPv6.</value>
-        [JsonPropertyName("ip")]
-        public string Ip { get; set; }
+        [JsonPropertyName("metadata")]
+        public TpayPaymentMetadata Metadata { get; set; }
 
         /// <summary>
-        /// HTTPS-адрес уведомлений.
+        /// HTTPS-адрес для уведомлений о платеже.
         /// </summary>
-        /// <value>HTTPS-адрес уведомлений.</value>
+        /// <value>HTTPS-адрес для уведомлений о платеже.</value>
         [JsonPropertyName("callbackUrl")]
         public string CallbackUrl { get; set; }
 
@@ -158,12 +95,6 @@ namespace OPayments.SDK.Model
         /// <value>HTTPS-адрес для отменённой оплаты.</value>
         [JsonPropertyName("failedUrl")]
         public string FailedUrl { get; set; }
-
-        /// <summary>
-        /// Gets or Sets DeviceData
-        /// </summary>
-        [JsonPropertyName("deviceData")]
-        public TpayDeviceData DeviceData { get; set; }
 
         /// <summary>
         /// Used to track the state of Description
@@ -188,12 +119,10 @@ namespace OPayments.SDK.Model
             sb.Append("class CreateTpayPaymentRequest {\n");
             sb.Append("  OrderId: ").Append(OrderId).Append("\n");
             sb.Append("  Amount: ").Append(Amount).Append("\n");
-            sb.Append("  Currency: ").Append(Currency).Append("\n");
-            sb.Append("  Ip: ").Append(Ip).Append("\n");
+            sb.Append("  Metadata: ").Append(Metadata).Append("\n");
             sb.Append("  CallbackUrl: ").Append(CallbackUrl).Append("\n");
             sb.Append("  SuccessUrl: ").Append(SuccessUrl).Append("\n");
             sb.Append("  FailedUrl: ").Append(FailedUrl).Append("\n");
-            sb.Append("  DeviceData: ").Append(DeviceData).Append("\n");
             sb.Append("  Description: ").Append(Description).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
@@ -222,12 +151,6 @@ namespace OPayments.SDK.Model
             if (this.Amount < (int)1)
             {
                 yield return new ValidationResult("Invalid value for Amount, must be a value greater than or equal to 1.", new [] { "Amount" });
-            }
-
-            // Ip (string) maxLength
-            if (this.Ip != null && this.Ip.Length > 45)
-            {
-                yield return new ValidationResult("Invalid value for Ip, length must be less than 45.", new [] { "Ip" });
             }
 
             // CallbackUrl (string) maxLength
@@ -322,12 +245,10 @@ namespace OPayments.SDK.Model
 
             Option<string?> orderId = default;
             Option<int?> amount = default;
-            Option<CreateTpayPaymentRequest.CurrencyEnum?> currency = default;
-            Option<string?> ip = default;
+            Option<TpayPaymentMetadata?> metadata = default;
             Option<string?> callbackUrl = default;
             Option<string?> successUrl = default;
             Option<string?> failedUrl = default;
-            Option<TpayDeviceData?> deviceData = default;
             Option<string?> description = default;
 
             while (utf8JsonReader.Read())
@@ -351,18 +272,8 @@ namespace OPayments.SDK.Model
                         case "amount":
                             amount = new Option<int?>(utf8JsonReader.TokenType == JsonTokenType.Null ? (int?)null : utf8JsonReader.GetInt32());
                             break;
-                        case "currency":
-                            string? currencyRawValue = utf8JsonReader.GetString();
-                            if (currencyRawValue != null)
-                            {
-                                CreateTpayPaymentRequest.CurrencyEnum? currencyValue = CreateTpayPaymentRequest.CurrencyEnumFromStringOrDefault(currencyRawValue);
-                                if (currencyValue == null)
-                                    throw new JsonException();
-                                currency = new Option<CreateTpayPaymentRequest.CurrencyEnum?>(currencyValue);
-                            }
-                            break;
-                        case "ip":
-                            ip = new Option<string?>(utf8JsonReader.GetString()!);
+                        case "metadata":
+                            metadata = new Option<TpayPaymentMetadata?>(JsonSerializer.Deserialize<TpayPaymentMetadata>(ref utf8JsonReader, jsonSerializerOptions)!);
                             break;
                         case "callbackUrl":
                             callbackUrl = new Option<string?>(utf8JsonReader.GetString()!);
@@ -372,9 +283,6 @@ namespace OPayments.SDK.Model
                             break;
                         case "failedUrl":
                             failedUrl = new Option<string?>(utf8JsonReader.GetString()!);
-                            break;
-                        case "deviceData":
-                            deviceData = new Option<TpayDeviceData?>(JsonSerializer.Deserialize<TpayDeviceData>(ref utf8JsonReader, jsonSerializerOptions)!);
                             break;
                         case "description":
                             description = new Option<string?>(utf8JsonReader.GetString()!);
@@ -391,11 +299,8 @@ namespace OPayments.SDK.Model
             if (!amount.IsSet)
                 throw new ArgumentException("Property is required for class CreateTpayPaymentRequest.", nameof(amount));
 
-            if (!currency.IsSet)
-                throw new ArgumentException("Property is required for class CreateTpayPaymentRequest.", nameof(currency));
-
-            if (!ip.IsSet)
-                throw new ArgumentException("Property is required for class CreateTpayPaymentRequest.", nameof(ip));
+            if (!metadata.IsSet)
+                throw new ArgumentException("Property is required for class CreateTpayPaymentRequest.", nameof(metadata));
 
             if (!callbackUrl.IsSet)
                 throw new ArgumentException("Property is required for class CreateTpayPaymentRequest.", nameof(callbackUrl));
@@ -406,20 +311,14 @@ namespace OPayments.SDK.Model
             if (!failedUrl.IsSet)
                 throw new ArgumentException("Property is required for class CreateTpayPaymentRequest.", nameof(failedUrl));
 
-            if (!deviceData.IsSet)
-                throw new ArgumentException("Property is required for class CreateTpayPaymentRequest.", nameof(deviceData));
-
             if (orderId.IsSet && orderId.Value == null)
                 throw new ArgumentNullException(nameof(orderId), "Property is not nullable for class CreateTpayPaymentRequest.");
 
             if (amount.IsSet && amount.Value == null)
                 throw new ArgumentNullException(nameof(amount), "Property is not nullable for class CreateTpayPaymentRequest.");
 
-            if (currency.IsSet && currency.Value == null)
-                throw new ArgumentNullException(nameof(currency), "Property is not nullable for class CreateTpayPaymentRequest.");
-
-            if (ip.IsSet && ip.Value == null)
-                throw new ArgumentNullException(nameof(ip), "Property is not nullable for class CreateTpayPaymentRequest.");
+            if (metadata.IsSet && metadata.Value == null)
+                throw new ArgumentNullException(nameof(metadata), "Property is not nullable for class CreateTpayPaymentRequest.");
 
             if (callbackUrl.IsSet && callbackUrl.Value == null)
                 throw new ArgumentNullException(nameof(callbackUrl), "Property is not nullable for class CreateTpayPaymentRequest.");
@@ -430,13 +329,10 @@ namespace OPayments.SDK.Model
             if (failedUrl.IsSet && failedUrl.Value == null)
                 throw new ArgumentNullException(nameof(failedUrl), "Property is not nullable for class CreateTpayPaymentRequest.");
 
-            if (deviceData.IsSet && deviceData.Value == null)
-                throw new ArgumentNullException(nameof(deviceData), "Property is not nullable for class CreateTpayPaymentRequest.");
-
             if (description.IsSet && description.Value == null)
                 throw new ArgumentNullException(nameof(description), "Property is not nullable for class CreateTpayPaymentRequest.");
 
-            return new CreateTpayPaymentRequest(orderId.Value!, amount.Value!.Value!, currency.Value!.Value!, ip.Value!, callbackUrl.Value!, successUrl.Value!, failedUrl.Value!, deviceData.Value!, description);
+            return new CreateTpayPaymentRequest(orderId.Value!, amount.Value!.Value!, metadata.Value!, callbackUrl.Value!, successUrl.Value!, failedUrl.Value!, description);
         }
 
         /// <summary>
@@ -466,8 +362,8 @@ namespace OPayments.SDK.Model
             if (createTpayPaymentRequest.OrderId == null)
                 throw new ArgumentNullException(nameof(createTpayPaymentRequest.OrderId), "Property is required for class CreateTpayPaymentRequest.");
 
-            if (createTpayPaymentRequest.Ip == null)
-                throw new ArgumentNullException(nameof(createTpayPaymentRequest.Ip), "Property is required for class CreateTpayPaymentRequest.");
+            if (createTpayPaymentRequest.Metadata == null)
+                throw new ArgumentNullException(nameof(createTpayPaymentRequest.Metadata), "Property is required for class CreateTpayPaymentRequest.");
 
             if (createTpayPaymentRequest.CallbackUrl == null)
                 throw new ArgumentNullException(nameof(createTpayPaymentRequest.CallbackUrl), "Property is required for class CreateTpayPaymentRequest.");
@@ -478,9 +374,6 @@ namespace OPayments.SDK.Model
             if (createTpayPaymentRequest.FailedUrl == null)
                 throw new ArgumentNullException(nameof(createTpayPaymentRequest.FailedUrl), "Property is required for class CreateTpayPaymentRequest.");
 
-            if (createTpayPaymentRequest.DeviceData == null)
-                throw new ArgumentNullException(nameof(createTpayPaymentRequest.DeviceData), "Property is required for class CreateTpayPaymentRequest.");
-
             if (createTpayPaymentRequest.DescriptionOption.IsSet && createTpayPaymentRequest.Description == null)
                 throw new ArgumentNullException(nameof(createTpayPaymentRequest.Description), "Property is required for class CreateTpayPaymentRequest.");
 
@@ -488,18 +381,14 @@ namespace OPayments.SDK.Model
 
             writer.WriteNumber("amount", createTpayPaymentRequest.Amount);
 
-            var currencyRawValue = CreateTpayPaymentRequest.CurrencyEnumToJsonValue(createTpayPaymentRequest.Currency);
-            writer.WriteString("currency", currencyRawValue);
-            writer.WriteString("ip", createTpayPaymentRequest.Ip);
-
+            writer.WritePropertyName("metadata");
+            JsonSerializer.Serialize(writer, createTpayPaymentRequest.Metadata, jsonSerializerOptions);
             writer.WriteString("callbackUrl", createTpayPaymentRequest.CallbackUrl);
 
             writer.WriteString("successUrl", createTpayPaymentRequest.SuccessUrl);
 
             writer.WriteString("failedUrl", createTpayPaymentRequest.FailedUrl);
 
-            writer.WritePropertyName("deviceData");
-            JsonSerializer.Serialize(writer, createTpayPaymentRequest.DeviceData, jsonSerializerOptions);
             if (createTpayPaymentRequest.DescriptionOption.IsSet)
                 writer.WriteString("description", createTpayPaymentRequest.Description);
         }

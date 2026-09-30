@@ -33,26 +33,32 @@ namespace OPayments.SDK.Model
         /// <summary>
         /// Initializes a new instance of the <see cref="Refund" /> class.
         /// </summary>
+        /// <param name="refundId">refundId</param>
         /// <param name="paymentId">paymentId</param>
         /// <param name="amount">Сумма в копейках.</param>
         /// <param name="currency">currency</param>
         /// <param name="status">status</param>
         /// <param name="createdAt">createdAt</param>
         /// <param name="updatedAt">updatedAt</param>
+        /// <param name="reasonCode">reasonCode</param>
+        /// <param name="reasonComment">reasonComment</param>
         /// <param name="reason">reason</param>
         /// <param name="failureCode">failureCode</param>
         /// <param name="failureMessage">failureMessage</param>
         /// <param name="acceptedAt">acceptedAt</param>
         /// <param name="declinedAt">declinedAt</param>
         [JsonConstructor]
-        public Refund(Guid paymentId, int amount, CurrencyEnum currency, StatusEnum status, DateTime createdAt, DateTime updatedAt, Option<string?> reason = default, Option<string?> failureCode = default, Option<string?> failureMessage = default, Option<DateTime?> acceptedAt = default, Option<DateTime?> declinedAt = default)
+        public Refund(Guid refundId, Guid paymentId, int amount, CurrencyEnum currency, StatusEnum status, DateTime createdAt, DateTime updatedAt, Option<RefundReason?> reasonCode = default, Option<string?> reasonComment = default, Option<string?> reason = default, Option<string?> failureCode = default, Option<string?> failureMessage = default, Option<DateTime?> acceptedAt = default, Option<DateTime?> declinedAt = default)
         {
+            RefundId = refundId;
             PaymentId = paymentId;
             Amount = amount;
             Currency = currency;
             Status = status;
             CreatedAt = createdAt;
             UpdatedAt = updatedAt;
+            ReasonCodeOption = reasonCode;
+            ReasonCommentOption = reasonComment;
             ReasonOption = reason;
             FailureCodeOption = failureCode;
             FailureMessageOption = failureMessage;
@@ -208,6 +214,25 @@ namespace OPayments.SDK.Model
         public StatusEnum Status { get; set; }
 
         /// <summary>
+        /// Used to track the state of ReasonCode
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<RefundReason?> ReasonCodeOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets ReasonCode
+        /// </summary>
+        [JsonPropertyName("reasonCode")]
+        public RefundReason? ReasonCode { get { return this.ReasonCodeOption.Value; } set { this.ReasonCodeOption = new(value); } }
+
+        /// <summary>
+        /// Gets or Sets RefundId
+        /// </summary>
+        [JsonPropertyName("refundId")]
+        public Guid RefundId { get; set; }
+
+        /// <summary>
         /// Gets or Sets PaymentId
         /// </summary>
         [JsonPropertyName("paymentId")]
@@ -233,6 +258,19 @@ namespace OPayments.SDK.Model
         public DateTime UpdatedAt { get; set; }
 
         /// <summary>
+        /// Used to track the state of ReasonComment
+        /// </summary>
+        [JsonIgnore]
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public Option<string?> ReasonCommentOption { get; private set; }
+
+        /// <summary>
+        /// Gets or Sets ReasonComment
+        /// </summary>
+        [JsonPropertyName("reasonComment")]
+        public string? ReasonComment { get { return this.ReasonCommentOption.Value; } set { this.ReasonCommentOption = new(value); } }
+
+        /// <summary>
         /// Used to track the state of Reason
         /// </summary>
         [JsonIgnore]
@@ -243,6 +281,7 @@ namespace OPayments.SDK.Model
         /// Gets or Sets Reason
         /// </summary>
         [JsonPropertyName("reason")]
+        [Obsolete]
         public string? Reason { get { return this.ReasonOption.Value; } set { this.ReasonOption = new(value); } }
 
         /// <summary>
@@ -305,12 +344,15 @@ namespace OPayments.SDK.Model
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("class Refund {\n");
+            sb.Append("  RefundId: ").Append(RefundId).Append("\n");
             sb.Append("  PaymentId: ").Append(PaymentId).Append("\n");
             sb.Append("  Amount: ").Append(Amount).Append("\n");
             sb.Append("  Currency: ").Append(Currency).Append("\n");
             sb.Append("  Status: ").Append(Status).Append("\n");
             sb.Append("  CreatedAt: ").Append(CreatedAt).Append("\n");
             sb.Append("  UpdatedAt: ").Append(UpdatedAt).Append("\n");
+            sb.Append("  ReasonCode: ").Append(ReasonCode).Append("\n");
+            sb.Append("  ReasonComment: ").Append(ReasonComment).Append("\n");
             sb.Append("  Reason: ").Append(Reason).Append("\n");
             sb.Append("  FailureCode: ").Append(FailureCode).Append("\n");
             sb.Append("  FailureMessage: ").Append(FailureMessage).Append("\n");
@@ -331,6 +373,12 @@ namespace OPayments.SDK.Model
             if (this.Amount < (int)1)
             {
                 yield return new ValidationResult("Invalid value for Amount, must be a value greater than or equal to 1.", new [] { "Amount" });
+            }
+
+            // ReasonComment (string) maxLength
+            if (this.ReasonComment != null && this.ReasonComment.Length > 255)
+            {
+                yield return new ValidationResult("Invalid value for ReasonComment, length must be less than 255.", new [] { "ReasonComment" });
             }
 
             yield break;
@@ -389,12 +437,15 @@ namespace OPayments.SDK.Model
 
             JsonTokenType startingTokenType = utf8JsonReader.TokenType;
 
+            Option<Guid?> refundId = default;
             Option<Guid?> paymentId = default;
             Option<int?> amount = default;
             Option<Refund.CurrencyEnum?> currency = default;
             Option<Refund.StatusEnum?> status = default;
             Option<DateTime?> createdAt = default;
             Option<DateTime?> updatedAt = default;
+            Option<RefundReason?> reasonCode = default;
+            Option<string?> reasonComment = default;
             Option<string?> reason = default;
             Option<string?> failureCode = default;
             Option<string?> failureMessage = default;
@@ -416,6 +467,9 @@ namespace OPayments.SDK.Model
 
                     switch (localVarJsonPropertyName)
                     {
+                        case "refundId":
+                            refundId = new Option<Guid?>(utf8JsonReader.TokenType == JsonTokenType.Null ? (Guid?)null : utf8JsonReader.GetGuid());
+                            break;
                         case "paymentId":
                             paymentId = new Option<Guid?>(utf8JsonReader.TokenType == JsonTokenType.Null ? (Guid?)null : utf8JsonReader.GetGuid());
                             break;
@@ -448,6 +502,12 @@ namespace OPayments.SDK.Model
                         case "updatedAt":
                             updatedAt = new Option<DateTime?>(JsonSerializer.Deserialize<DateTime>(ref utf8JsonReader, jsonSerializerOptions));
                             break;
+                        case "reasonCode":
+                            reasonCode = new Option<RefundReason?>(JsonSerializer.Deserialize<RefundReason?>(ref utf8JsonReader, jsonSerializerOptions));
+                            break;
+                        case "reasonComment":
+                            reasonComment = new Option<string?>(utf8JsonReader.GetString()!);
+                            break;
                         case "reason":
                             reason = new Option<string?>(utf8JsonReader.GetString()!);
                             break;
@@ -469,6 +529,9 @@ namespace OPayments.SDK.Model
                 }
             }
 
+            if (!refundId.IsSet)
+                throw new ArgumentException("Property is required for class Refund.", nameof(refundId));
+
             if (!paymentId.IsSet)
                 throw new ArgumentException("Property is required for class Refund.", nameof(paymentId));
 
@@ -486,6 +549,9 @@ namespace OPayments.SDK.Model
 
             if (!updatedAt.IsSet)
                 throw new ArgumentException("Property is required for class Refund.", nameof(updatedAt));
+
+            if (refundId.IsSet && refundId.Value == null)
+                throw new ArgumentNullException(nameof(refundId), "Property is not nullable for class Refund.");
 
             if (paymentId.IsSet && paymentId.Value == null)
                 throw new ArgumentNullException(nameof(paymentId), "Property is not nullable for class Refund.");
@@ -505,6 +571,12 @@ namespace OPayments.SDK.Model
             if (updatedAt.IsSet && updatedAt.Value == null)
                 throw new ArgumentNullException(nameof(updatedAt), "Property is not nullable for class Refund.");
 
+            if (reasonCode.IsSet && reasonCode.Value == null)
+                throw new ArgumentNullException(nameof(reasonCode), "Property is not nullable for class Refund.");
+
+            if (reasonComment.IsSet && reasonComment.Value == null)
+                throw new ArgumentNullException(nameof(reasonComment), "Property is not nullable for class Refund.");
+
             if (reason.IsSet && reason.Value == null)
                 throw new ArgumentNullException(nameof(reason), "Property is not nullable for class Refund.");
 
@@ -520,7 +592,7 @@ namespace OPayments.SDK.Model
             if (declinedAt.IsSet && declinedAt.Value == null)
                 throw new ArgumentNullException(nameof(declinedAt), "Property is not nullable for class Refund.");
 
-            return new Refund(paymentId.Value!.Value!, amount.Value!.Value!, currency.Value!.Value!, status.Value!.Value!, createdAt.Value!.Value!, updatedAt.Value!.Value!, reason, failureCode, failureMessage, acceptedAt, declinedAt);
+            return new Refund(refundId.Value!.Value!, paymentId.Value!.Value!, amount.Value!.Value!, currency.Value!.Value!, status.Value!.Value!, createdAt.Value!.Value!, updatedAt.Value!.Value!, reasonCode, reasonComment, reason, failureCode, failureMessage, acceptedAt, declinedAt);
         }
 
         /// <summary>
@@ -547,6 +619,9 @@ namespace OPayments.SDK.Model
         /// <exception cref="NotImplementedException"></exception>
         public void WriteProperties(Utf8JsonWriter writer, Refund refund, JsonSerializerOptions jsonSerializerOptions)
         {
+            if (refund.ReasonCommentOption.IsSet && refund.ReasonComment == null)
+                throw new ArgumentNullException(nameof(refund.ReasonComment), "Property is required for class Refund.");
+
             if (refund.ReasonOption.IsSet && refund.Reason == null)
                 throw new ArgumentNullException(nameof(refund.Reason), "Property is required for class Refund.");
 
@@ -555,6 +630,8 @@ namespace OPayments.SDK.Model
 
             if (refund.FailureMessageOption.IsSet && refund.FailureMessage == null)
                 throw new ArgumentNullException(nameof(refund.FailureMessage), "Property is required for class Refund.");
+
+            writer.WriteString("refundId", refund.RefundId);
 
             writer.WriteString("paymentId", refund.PaymentId);
 
@@ -567,6 +644,14 @@ namespace OPayments.SDK.Model
             writer.WriteString("createdAt", refund.CreatedAt.ToString(CreatedAtFormat));
 
             writer.WriteString("updatedAt", refund.UpdatedAt.ToString(UpdatedAtFormat));
+
+            if (refund.ReasonCodeOption.IsSet)
+            {
+                var reasonCodeRawValue = RefundReasonValueConverter.ToJsonValue(refund.ReasonCode!.Value);
+                writer.WriteString("reasonCode", reasonCodeRawValue);
+            }
+            if (refund.ReasonCommentOption.IsSet)
+                writer.WriteString("reasonComment", refund.ReasonComment);
 
             if (refund.ReasonOption.IsSet)
                 writer.WriteString("reason", refund.Reason);

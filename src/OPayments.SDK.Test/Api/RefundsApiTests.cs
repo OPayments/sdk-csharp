@@ -58,21 +58,57 @@ namespace OPayments.SDK.Test.Api
         {
             Guid paymentId = default!;
             CreateRefundRequest createRefundRequest = default!;
-            var response = await _instance.CreatePaymentRefundAsync(paymentId, createRefundRequest);
+            Client.Option<string> idempotencyKey = default!;
+            var response = await _instance.CreatePaymentRefundAsync(paymentId, createRefundRequest, idempotencyKey);
             var model = response.Ok();
             Assert.IsType<OPayments.SDK.Model.Refund>(model);
         }
 
         /// <summary>
-        /// Test GetPaymentRefund
+        /// Test GetRefund
         /// </summary>
         [Fact (Skip = "not implemented")]
-        public async Task GetPaymentRefundAsyncTest()
+        public async Task GetRefundAsyncTest()
         {
-            Guid paymentId = default!;
-            var response = await _instance.GetPaymentRefundAsync(paymentId);
+            Guid refundId = default!;
+            var response = await _instance.GetRefundAsync(refundId);
             var model = response.Ok();
             Assert.IsType<OPayments.SDK.Model.Refund>(model);
+        }
+
+        /// <summary>
+        /// Test ListPaymentRefunds
+        /// </summary>
+        [Fact (Skip = "not implemented")]
+        public async Task ListPaymentRefundsAsyncTest()
+        {
+            Guid paymentId = default!;
+            Client.Option<string> status = default!;
+            Client.Option<RefundReason> reasonCode = default!;
+            Client.Option<string> cursor = default!;
+            Client.Option<int> limit = default!;
+            var response = await _instance.ListPaymentRefundsAsync(paymentId, status, reasonCode, cursor, limit);
+            var model = response.Ok();
+            Assert.IsType<OPayments.SDK.Model.RefundPage>(model);
+        }
+
+        /// <summary>
+        /// Test ListRefunds
+        /// </summary>
+        [Fact (Skip = "not implemented")]
+        public async Task ListRefundsAsyncTest()
+        {
+            Client.Option<string> status = default!;
+            Client.Option<string> paymentMethod = default!;
+            Client.Option<Guid> paymentId = default!;
+            Client.Option<RefundReason> reasonCode = default!;
+            Client.Option<DateTime> createdFrom = default!;
+            Client.Option<DateTime> createdTo = default!;
+            Client.Option<string> cursor = default!;
+            Client.Option<int> limit = default!;
+            var response = await _instance.ListRefundsAsync(status, paymentMethod, paymentId, reasonCode, createdFrom, createdTo, cursor, limit);
+            var model = response.Ok();
+            Assert.IsType<OPayments.SDK.Model.RefundPage>(model);
         }
     }
 }

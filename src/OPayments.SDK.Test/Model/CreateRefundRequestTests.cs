@@ -63,6 +63,24 @@ namespace OPayments.SDK.Test.Model
         }
 
         /// <summary>
+        /// Test the property 'ReasonCode'
+        /// </summary>
+        [Fact]
+        public void ReasonCodeTest()
+        {
+            // TODO unit test for the property 'ReasonCode'
+        }
+
+        /// <summary>
+        /// Test the property 'ReasonComment'
+        /// </summary>
+        [Fact]
+        public void ReasonCommentTest()
+        {
+            // TODO unit test for the property 'ReasonComment'
+        }
+
+        /// <summary>
         /// Test the property 'Reason'
         /// </summary>
         [Fact]

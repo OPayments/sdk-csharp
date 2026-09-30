@@ -50,6 +50,12 @@ namespace OPayments.SDK.Model
         public ErrorError VarError { get; set; }
 
         /// <summary>
+        /// Gets or Sets additional properties
+        /// </summary>
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement> AdditionalProperties { get; } = new Dictionary<string, JsonElement>();
+
+        /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
@@ -58,6 +64,7 @@ namespace OPayments.SDK.Model
             StringBuilder sb = new StringBuilder();
             sb.Append("class Error {\n");
             sb.Append("  VarError: ").Append(VarError).Append("\n");
+            sb.Append("  AdditionalProperties: ").Append(AdditionalProperties).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }

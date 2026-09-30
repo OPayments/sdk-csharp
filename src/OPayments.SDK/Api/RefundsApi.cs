@@ -47,9 +47,10 @@ namespace OPayments.SDK.Api
         /// <exception cref="ApiException">Thrown when fails to make API call</exception>
         /// <param name="paymentId"></param>
         /// <param name="createRefundRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreatePaymentRefundApiResponse"/>&gt;</returns>
-        Task<ICreatePaymentRefundApiResponse> CreatePaymentRefundAsync(Guid paymentId, CreateRefundRequest createRefundRequest, System.Threading.CancellationToken cancellationToken = default);
+        Task<ICreatePaymentRefundApiResponse> CreatePaymentRefundAsync(Guid paymentId, CreateRefundRequest createRefundRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Создать возврат
@@ -59,9 +60,10 @@ namespace OPayments.SDK.Api
         /// </remarks>
         /// <param name="paymentId"></param>
         /// <param name="createRefundRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreatePaymentRefundApiResponse"/>?&gt;</returns>
-        Task<ICreatePaymentRefundApiResponse?> CreatePaymentRefundOrDefaultAsync(Guid paymentId, CreateRefundRequest createRefundRequest, System.Threading.CancellationToken cancellationToken = default);
+        Task<ICreatePaymentRefundApiResponse?> CreatePaymentRefundOrDefaultAsync(Guid paymentId, CreateRefundRequest createRefundRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Получить возврат
@@ -70,10 +72,10 @@ namespace OPayments.SDK.Api
         /// 
         /// </remarks>
         /// <exception cref="ApiException">Thrown when fails to make API call</exception>
-        /// <param name="paymentId"></param>
+        /// <param name="refundId"></param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns><see cref="Task"/>&lt;<see cref="IGetPaymentRefundApiResponse"/>&gt;</returns>
-        Task<IGetPaymentRefundApiResponse> GetPaymentRefundAsync(Guid paymentId, System.Threading.CancellationToken cancellationToken = default);
+        /// <returns><see cref="Task"/>&lt;<see cref="IGetRefundApiResponse"/>&gt;</returns>
+        Task<IGetRefundApiResponse> GetRefundAsync(Guid refundId, System.Threading.CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Получить возврат
@@ -81,16 +83,84 @@ namespace OPayments.SDK.Api
         /// <remarks>
         /// 
         /// </remarks>
-        /// <param name="paymentId"></param>
+        /// <param name="refundId"></param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns><see cref="Task"/>&lt;<see cref="IGetPaymentRefundApiResponse"/>?&gt;</returns>
-        Task<IGetPaymentRefundApiResponse?> GetPaymentRefundOrDefaultAsync(Guid paymentId, System.Threading.CancellationToken cancellationToken = default);
+        /// <returns><see cref="Task"/>&lt;<see cref="IGetRefundApiResponse"/>?&gt;</returns>
+        Task<IGetRefundApiResponse?> GetRefundOrDefaultAsync(Guid refundId, System.Threading.CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Найти возвраты платежа
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
+        /// <exception cref="ApiException">Thrown when fails to make API call</exception>
+        /// <param name="paymentId"></param>
+        /// <param name="status"> (optional)</param>
+        /// <param name="reasonCode"> (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
+        /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns><see cref="Task"/>&lt;<see cref="IListPaymentRefundsApiResponse"/>&gt;</returns>
+        Task<IListPaymentRefundsApiResponse> ListPaymentRefundsAsync(Guid paymentId, Option<string> status = default, Option<RefundReason> reasonCode = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Найти возвраты платежа
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
+        /// <param name="paymentId"></param>
+        /// <param name="status"> (optional)</param>
+        /// <param name="reasonCode"> (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
+        /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns><see cref="Task"/>&lt;<see cref="IListPaymentRefundsApiResponse"/>?&gt;</returns>
+        Task<IListPaymentRefundsApiResponse?> ListPaymentRefundsOrDefaultAsync(Guid paymentId, Option<string> status = default, Option<RefundReason> reasonCode = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Найти возвраты проекта
+        /// </summary>
+        /// <remarks>
+        /// Возвращает возвраты по всем платежам текущего проекта. Сортировка всегда &#x60;createdAt DESC, refundId DESC&#x60;; курсор нельзя использовать с другими фильтрами.
+        /// </remarks>
+        /// <exception cref="ApiException">Thrown when fails to make API call</exception>
+        /// <param name="status"> (optional)</param>
+        /// <param name="paymentMethod"> (optional)</param>
+        /// <param name="paymentId">Идентификатор исходного платежа. (optional)</param>
+        /// <param name="reasonCode"> (optional)</param>
+        /// <param name="createdFrom">Не позже createdTo, если он передан. (optional)</param>
+        /// <param name="createdTo">Не раньше createdFrom, если он передан. (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
+        /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns><see cref="Task"/>&lt;<see cref="IListRefundsApiResponse"/>&gt;</returns>
+        Task<IListRefundsApiResponse> ListRefundsAsync(Option<string> status = default, Option<string> paymentMethod = default, Option<Guid> paymentId = default, Option<RefundReason> reasonCode = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Найти возвраты проекта
+        /// </summary>
+        /// <remarks>
+        /// Возвращает возвраты по всем платежам текущего проекта. Сортировка всегда &#x60;createdAt DESC, refundId DESC&#x60;; курсор нельзя использовать с другими фильтрами.
+        /// </remarks>
+        /// <param name="status"> (optional)</param>
+        /// <param name="paymentMethod"> (optional)</param>
+        /// <param name="paymentId">Идентификатор исходного платежа. (optional)</param>
+        /// <param name="reasonCode"> (optional)</param>
+        /// <param name="createdFrom">Не позже createdTo, если он передан. (optional)</param>
+        /// <param name="createdTo">Не раньше createdFrom, если он передан. (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
+        /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns><see cref="Task"/>&lt;<see cref="IListRefundsApiResponse"/>?&gt;</returns>
+        Task<IListRefundsApiResponse?> ListRefundsOrDefaultAsync(Option<string> status = default, Option<string> paymentMethod = default, Option<Guid> paymentId = default, Option<RefundReason> reasonCode = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default);
     }
 
     /// <summary>
     /// The <see cref="ICreatePaymentRefundApiResponse"/>
     /// </summary>
-    public interface ICreatePaymentRefundApiResponse : OPayments.SDK.Client.IApiResponse, IOk<OPayments.SDK.Model.Refund?>, IAccepted<OPayments.SDK.Model.PendingRefund?>, IBadRequest<OPayments.SDK.Model.Error?>, IUnauthorized<OPayments.SDK.Model.Error?>, INotFound<OPayments.SDK.Model.Error?>, IConflict<OPayments.SDK.Model.Error?>, IUnsupportedMediaType<OPayments.SDK.Model.Error?>, IUnprocessableContent<OPayments.SDK.Model.Error?>, ITooManyRequests<OPayments.SDK.Model.Error?>, IInternalServerError<OPayments.SDK.Model.Error?>, IBadGateway<OPayments.SDK.Model.Error?>, IServiceUnavailable<OPayments.SDK.Model.Error?>, IGatewayTimeout<OPayments.SDK.Model.Error?>
+    public interface ICreatePaymentRefundApiResponse : OPayments.SDK.Client.IApiResponse, IOk<OPayments.SDK.Model.Refund?>, IAccepted<OPayments.SDK.Model.PendingRefund?>, IBadRequest<OPayments.SDK.Model.Error?>, IUnauthorized<OPayments.SDK.Model.Error?>, INotFound<OPayments.SDK.Model.Error?>, IConflict<OPayments.SDK.Model.Error?>, IUnprocessableContent<OPayments.SDK.Model.Error?>, IUnsupportedMediaType<OPayments.SDK.Model.Error?>, ITooManyRequests<OPayments.SDK.Model.Error?>, IInternalServerError<OPayments.SDK.Model.Error?>, IBadGateway<OPayments.SDK.Model.Error?>, IServiceUnavailable<OPayments.SDK.Model.Error?>, IGatewayTimeout<OPayments.SDK.Model.Error?>
     {
         /// <summary>
         /// Returns true if the response is 200 Ok
@@ -129,16 +199,16 @@ namespace OPayments.SDK.Api
         bool IsConflict { get; }
 
         /// <summary>
-        /// Returns true if the response is 415 UnsupportedMediaType
-        /// </summary>
-        /// <returns></returns>
-        bool IsUnsupportedMediaType { get; }
-
-        /// <summary>
         /// Returns true if the response is 422 UnprocessableContent
         /// </summary>
         /// <returns></returns>
         bool IsUnprocessableContent { get; }
+
+        /// <summary>
+        /// Returns true if the response is 415 UnsupportedMediaType
+        /// </summary>
+        /// <returns></returns>
+        bool IsUnsupportedMediaType { get; }
 
         /// <summary>
         /// Returns true if the response is 429 TooManyRequests
@@ -172,9 +242,9 @@ namespace OPayments.SDK.Api
     }
 
     /// <summary>
-    /// The <see cref="IGetPaymentRefundApiResponse"/>
+    /// The <see cref="IGetRefundApiResponse"/>
     /// </summary>
-    public interface IGetPaymentRefundApiResponse : OPayments.SDK.Client.IApiResponse, IOk<OPayments.SDK.Model.Refund?>, IBadRequest<OPayments.SDK.Model.Error?>, IUnauthorized<OPayments.SDK.Model.Error?>, INotFound<OPayments.SDK.Model.Error?>, ITooManyRequests<OPayments.SDK.Model.Error?>
+    public interface IGetRefundApiResponse : OPayments.SDK.Client.IApiResponse, IOk<OPayments.SDK.Model.Refund?>, IBadRequest<OPayments.SDK.Model.Error?>, IUnauthorized<OPayments.SDK.Model.Error?>, INotFound<OPayments.SDK.Model.Error?>, ITooManyRequests<OPayments.SDK.Model.Error?>
     {
         /// <summary>
         /// Returns true if the response is 200 Ok
@@ -199,6 +269,72 @@ namespace OPayments.SDK.Api
         /// </summary>
         /// <returns></returns>
         bool IsNotFound { get; }
+
+        /// <summary>
+        /// Returns true if the response is 429 TooManyRequests
+        /// </summary>
+        /// <returns></returns>
+        bool IsTooManyRequests { get; }
+    }
+
+    /// <summary>
+    /// The <see cref="IListPaymentRefundsApiResponse"/>
+    /// </summary>
+    public interface IListPaymentRefundsApiResponse : OPayments.SDK.Client.IApiResponse, IOk<OPayments.SDK.Model.RefundPage?>, IBadRequest<OPayments.SDK.Model.Error?>, IUnauthorized<OPayments.SDK.Model.Error?>, INotFound<OPayments.SDK.Model.Error?>, ITooManyRequests<OPayments.SDK.Model.Error?>
+    {
+        /// <summary>
+        /// Returns true if the response is 200 Ok
+        /// </summary>
+        /// <returns></returns>
+        bool IsOk { get; }
+
+        /// <summary>
+        /// Returns true if the response is 400 BadRequest
+        /// </summary>
+        /// <returns></returns>
+        bool IsBadRequest { get; }
+
+        /// <summary>
+        /// Returns true if the response is 401 Unauthorized
+        /// </summary>
+        /// <returns></returns>
+        bool IsUnauthorized { get; }
+
+        /// <summary>
+        /// Returns true if the response is 404 NotFound
+        /// </summary>
+        /// <returns></returns>
+        bool IsNotFound { get; }
+
+        /// <summary>
+        /// Returns true if the response is 429 TooManyRequests
+        /// </summary>
+        /// <returns></returns>
+        bool IsTooManyRequests { get; }
+    }
+
+    /// <summary>
+    /// The <see cref="IListRefundsApiResponse"/>
+    /// </summary>
+    public interface IListRefundsApiResponse : OPayments.SDK.Client.IApiResponse, IOk<OPayments.SDK.Model.RefundPage?>, IBadRequest<OPayments.SDK.Model.Error?>, IUnauthorized<OPayments.SDK.Model.Error?>, ITooManyRequests<OPayments.SDK.Model.Error?>
+    {
+        /// <summary>
+        /// Returns true if the response is 200 Ok
+        /// </summary>
+        /// <returns></returns>
+        bool IsOk { get; }
+
+        /// <summary>
+        /// Returns true if the response is 400 BadRequest
+        /// </summary>
+        /// <returns></returns>
+        bool IsBadRequest { get; }
+
+        /// <summary>
+        /// Returns true if the response is 401 Unauthorized
+        /// </summary>
+        /// <returns></returns>
+        bool IsUnauthorized { get; }
 
         /// <summary>
         /// Returns true if the response is 429 TooManyRequests
@@ -235,21 +371,61 @@ namespace OPayments.SDK.Api
         /// <summary>
         /// The event raised after the server response
         /// </summary>
-        public event EventHandler<ApiResponseEventArgs>? OnGetPaymentRefund;
+        public event EventHandler<ApiResponseEventArgs>? OnGetRefund;
 
         /// <summary>
         /// The event raised after an error querying the server
         /// </summary>
-        public event EventHandler<ExceptionEventArgs>? OnErrorGetPaymentRefund;
+        public event EventHandler<ExceptionEventArgs>? OnErrorGetRefund;
 
-        internal void ExecuteOnGetPaymentRefund(RefundsApi.GetPaymentRefundApiResponse apiResponse)
+        internal void ExecuteOnGetRefund(RefundsApi.GetRefundApiResponse apiResponse)
         {
-            OnGetPaymentRefund?.Invoke(this, new ApiResponseEventArgs(apiResponse));
+            OnGetRefund?.Invoke(this, new ApiResponseEventArgs(apiResponse));
         }
 
-        internal void ExecuteOnErrorGetPaymentRefund(Exception exception)
+        internal void ExecuteOnErrorGetRefund(Exception exception)
         {
-            OnErrorGetPaymentRefund?.Invoke(this, new ExceptionEventArgs(exception));
+            OnErrorGetRefund?.Invoke(this, new ExceptionEventArgs(exception));
+        }
+
+        /// <summary>
+        /// The event raised after the server response
+        /// </summary>
+        public event EventHandler<ApiResponseEventArgs>? OnListPaymentRefunds;
+
+        /// <summary>
+        /// The event raised after an error querying the server
+        /// </summary>
+        public event EventHandler<ExceptionEventArgs>? OnErrorListPaymentRefunds;
+
+        internal void ExecuteOnListPaymentRefunds(RefundsApi.ListPaymentRefundsApiResponse apiResponse)
+        {
+            OnListPaymentRefunds?.Invoke(this, new ApiResponseEventArgs(apiResponse));
+        }
+
+        internal void ExecuteOnErrorListPaymentRefunds(Exception exception)
+        {
+            OnErrorListPaymentRefunds?.Invoke(this, new ExceptionEventArgs(exception));
+        }
+
+        /// <summary>
+        /// The event raised after the server response
+        /// </summary>
+        public event EventHandler<ApiResponseEventArgs>? OnListRefunds;
+
+        /// <summary>
+        /// The event raised after an error querying the server
+        /// </summary>
+        public event EventHandler<ExceptionEventArgs>? OnErrorListRefunds;
+
+        internal void ExecuteOnListRefunds(RefundsApi.ListRefundsApiResponse apiResponse)
+        {
+            OnListRefunds?.Invoke(this, new ApiResponseEventArgs(apiResponse));
+        }
+
+        internal void ExecuteOnErrorListRefunds(Exception exception)
+        {
+            OnErrorListRefunds?.Invoke(this, new ExceptionEventArgs(exception));
         }
     }
 
@@ -294,17 +470,21 @@ namespace OPayments.SDK.Api
             ApiKeyProvider = apiKeyProvider;
         }
 
-        partial void FormatCreatePaymentRefund(ref Guid paymentId, CreateRefundRequest createRefundRequest);
+        partial void FormatCreatePaymentRefund(ref Guid paymentId, CreateRefundRequest createRefundRequest, ref Option<string> idempotencyKey);
 
         /// <summary>
         /// Validates the request parameters
         /// </summary>
         /// <param name="createRefundRequest"></param>
+        /// <param name="idempotencyKey"></param>
         /// <returns></returns>
-        private void ValidateCreatePaymentRefund(CreateRefundRequest createRefundRequest)
+        private void ValidateCreatePaymentRefund(CreateRefundRequest createRefundRequest, Option<string> idempotencyKey)
         {
             if (createRefundRequest == null)
                 throw new ArgumentNullException(nameof(createRefundRequest));
+
+            if (idempotencyKey.IsSet && idempotencyKey.Value == null)
+                throw new ArgumentNullException(nameof(idempotencyKey));
         }
 
         /// <summary>
@@ -313,10 +493,11 @@ namespace OPayments.SDK.Api
         /// <param name="apiResponseLocalVar"></param>
         /// <param name="paymentId"></param>
         /// <param name="createRefundRequest"></param>
-        private void AfterCreatePaymentRefundDefaultImplementation(ICreatePaymentRefundApiResponse apiResponseLocalVar, Guid paymentId, CreateRefundRequest createRefundRequest)
+        /// <param name="idempotencyKey"></param>
+        private void AfterCreatePaymentRefundDefaultImplementation(ICreatePaymentRefundApiResponse apiResponseLocalVar, Guid paymentId, CreateRefundRequest createRefundRequest, Option<string> idempotencyKey)
         {
             bool suppressDefaultLog = false;
-            AfterCreatePaymentRefund(ref suppressDefaultLog, apiResponseLocalVar, paymentId, createRefundRequest);
+            AfterCreatePaymentRefund(ref suppressDefaultLog, apiResponseLocalVar, paymentId, createRefundRequest, idempotencyKey);
             if (!suppressDefaultLog)
                 Logger.LogInformation(RestLogEvents.ApiRequestCompleted, "{0,-9} | {1} | {2}", (apiResponseLocalVar.DownloadedAt - apiResponseLocalVar.RequestedAt).TotalSeconds, apiResponseLocalVar.StatusCode, apiResponseLocalVar.Path);
         }
@@ -328,7 +509,8 @@ namespace OPayments.SDK.Api
         /// <param name="apiResponseLocalVar"></param>
         /// <param name="paymentId"></param>
         /// <param name="createRefundRequest"></param>
-        partial void AfterCreatePaymentRefund(ref bool suppressDefaultLog, ICreatePaymentRefundApiResponse apiResponseLocalVar, Guid paymentId, CreateRefundRequest createRefundRequest);
+        /// <param name="idempotencyKey"></param>
+        partial void AfterCreatePaymentRefund(ref bool suppressDefaultLog, ICreatePaymentRefundApiResponse apiResponseLocalVar, Guid paymentId, CreateRefundRequest createRefundRequest, Option<string> idempotencyKey);
 
         /// <summary>
         /// Logs exceptions that occur while retrieving the server response
@@ -338,10 +520,11 @@ namespace OPayments.SDK.Api
         /// <param name="pathLocalVar"></param>
         /// <param name="paymentId"></param>
         /// <param name="createRefundRequest"></param>
-        private void OnErrorCreatePaymentRefundDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Guid paymentId, CreateRefundRequest createRefundRequest)
+        /// <param name="idempotencyKey"></param>
+        private void OnErrorCreatePaymentRefundDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Guid paymentId, CreateRefundRequest createRefundRequest, Option<string> idempotencyKey)
         {
             bool suppressDefaultLogLocalVar = false;
-            OnErrorCreatePaymentRefund(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, paymentId, createRefundRequest);
+            OnErrorCreatePaymentRefund(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, paymentId, createRefundRequest, idempotencyKey);
             if (!suppressDefaultLogLocalVar)
                 Logger.LogError(RestLogEvents.ApiRequestFailed, exceptionLocalVar, "An error occurred while sending the request to the server.");
         }
@@ -355,20 +538,22 @@ namespace OPayments.SDK.Api
         /// <param name="pathLocalVar"></param>
         /// <param name="paymentId"></param>
         /// <param name="createRefundRequest"></param>
-        partial void OnErrorCreatePaymentRefund(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Guid paymentId, CreateRefundRequest createRefundRequest);
+        /// <param name="idempotencyKey"></param>
+        partial void OnErrorCreatePaymentRefund(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Guid paymentId, CreateRefundRequest createRefundRequest, Option<string> idempotencyKey);
 
         /// <summary>
         /// Создать возврат 
         /// </summary>
         /// <param name="paymentId"></param>
         /// <param name="createRefundRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreatePaymentRefundApiResponse"/>&gt;</returns>
-        public async Task<ICreatePaymentRefundApiResponse?> CreatePaymentRefundOrDefaultAsync(Guid paymentId, CreateRefundRequest createRefundRequest, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ICreatePaymentRefundApiResponse?> CreatePaymentRefundOrDefaultAsync(Guid paymentId, CreateRefundRequest createRefundRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default)
         {
             try
             {
-                return await CreatePaymentRefundAsync(paymentId, createRefundRequest, cancellationToken).ConfigureAwait(false);
+                return await CreatePaymentRefundAsync(paymentId, createRefundRequest, idempotencyKey, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -382,17 +567,18 @@ namespace OPayments.SDK.Api
         /// <exception cref="ApiException">Thrown when fails to make API call</exception>
         /// <param name="paymentId"></param>
         /// <param name="createRefundRequest"></param>
+        /// <param name="idempotencyKey"> (optional)</param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
         /// <returns><see cref="Task"/>&lt;<see cref="ICreatePaymentRefundApiResponse"/>&gt;</returns>
-        public async Task<ICreatePaymentRefundApiResponse> CreatePaymentRefundAsync(Guid paymentId, CreateRefundRequest createRefundRequest, System.Threading.CancellationToken cancellationToken = default)
+        public async Task<ICreatePaymentRefundApiResponse> CreatePaymentRefundAsync(Guid paymentId, CreateRefundRequest createRefundRequest, Option<string> idempotencyKey = default, System.Threading.CancellationToken cancellationToken = default)
         {
             UriBuilder uriBuilderLocalVar = new UriBuilder();
 
             try
             {
-                ValidateCreatePaymentRefund(createRefundRequest);
+                ValidateCreatePaymentRefund(createRefundRequest, idempotencyKey);
 
-                FormatCreatePaymentRefund(ref paymentId, createRefundRequest);
+                FormatCreatePaymentRefund(ref paymentId, createRefundRequest, ref idempotencyKey);
 
                 using (HttpRequestMessage httpRequestMessageLocalVar = new HttpRequestMessage())
                 {
@@ -400,13 +586,26 @@ namespace OPayments.SDK.Api
                     uriBuilderLocalVar.Port = HttpClient.BaseAddress.Port;
                     uriBuilderLocalVar.Scheme = HttpClient.BaseAddress.Scheme;
                     uriBuilderLocalVar.Path = HttpClient.BaseAddress.AbsolutePath == "/"
-                        ? "/payments/{paymentId}/refund"
-                        : string.Concat(HttpClient.BaseAddress.AbsolutePath.TrimEnd('/'), "/payments/{paymentId}/refund");
+                        ? "/payments/{paymentId}/refunds"
+                        : string.Concat(HttpClient.BaseAddress.AbsolutePath.TrimEnd('/'), "/payments/{paymentId}/refunds");
                     uriBuilderLocalVar.Path = uriBuilderLocalVar.Path.Replace("%7BpaymentId%7D", Uri.EscapeDataString(paymentId.ToString()));
 
                     httpRequestMessageLocalVar.Content = (createRefundRequest as object) is OPayments.SDK.Client.FileParameter fileParameterLocalVar
                         ? httpRequestMessageLocalVar.Content = new StreamContent(fileParameterLocalVar.Content)
                         : httpRequestMessageLocalVar.Content = new StringContent(JsonSerializer.Serialize(createRefundRequest, _jsonSerializerOptions));
+
+                    if (idempotencyKey.IsSet)
+                    {
+                      // Set client side default value of Header Param "Idempotency-Key".                    
+                      if (ClientUtils.IsContentHeader("Idempotency-Key"))
+                      {
+                          httpRequestMessageLocalVar.Content?.Headers.Add("Idempotency-Key", ClientUtils.ParameterToString(idempotencyKey.Value));
+                      }
+                      else
+                      {
+                          httpRequestMessageLocalVar.Headers.Add("Idempotency-Key", ClientUtils.ParameterToString(idempotencyKey.Value));
+                      }
+                    }
 
                     List<TokenBase> tokenBaseLocalVars = new List<TokenBase>();
                     ApiKeyToken apiKeyTokenLocalVar1 = (ApiKeyToken) await ApiKeyProvider.GetAsync("X-Signature", cancellationToken).ConfigureAwait(false);
@@ -448,13 +647,13 @@ namespace OPayments.SDK.Api
                         switch ((int)httpResponseMessageLocalVar.StatusCode) {
                             default: {
                                 string responseContentLocalVar = await httpResponseMessageLocalVar.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                                apiResponseLocalVar = new(Logger, httpRequestMessageLocalVar, httpResponseMessageLocalVar, responseContentLocalVar, "/payments/{paymentId}/refund", requestedAtLocalVar, _jsonSerializerOptions);
+                                apiResponseLocalVar = new(Logger, httpRequestMessageLocalVar, httpResponseMessageLocalVar, responseContentLocalVar, "/payments/{paymentId}/refunds", requestedAtLocalVar, _jsonSerializerOptions);
 
                                 break;
                             }
                         }
 
-                        AfterCreatePaymentRefundDefaultImplementation(apiResponseLocalVar, paymentId, createRefundRequest);
+                        AfterCreatePaymentRefundDefaultImplementation(apiResponseLocalVar, paymentId, createRefundRequest, idempotencyKey);
 
                         Events.ExecuteOnCreatePaymentRefund(apiResponseLocalVar);
 
@@ -468,7 +667,7 @@ namespace OPayments.SDK.Api
             }
             catch(Exception e)
             {
-                OnErrorCreatePaymentRefundDefaultImplementation(e, "/payments/{paymentId}/refund", uriBuilderLocalVar.Path, paymentId, createRefundRequest);
+                OnErrorCreatePaymentRefundDefaultImplementation(e, "/payments/{paymentId}/refunds", uriBuilderLocalVar.Path, paymentId, createRefundRequest, idempotencyKey);
                 Events.ExecuteOnErrorCreatePaymentRefund(e);
                 throw;
             }
@@ -819,56 +1018,6 @@ namespace OPayments.SDK.Api
             }
 
             /// <summary>
-            /// Returns true if the response is 415 UnsupportedMediaType
-            /// </summary>
-            /// <returns></returns>
-            public bool IsUnsupportedMediaType => 415 == (int)StatusCode;
-
-            /// <summary>
-            /// Deserializes the response if the response is 415 UnsupportedMediaType
-            /// </summary>
-            /// <returns></returns>
-            public OPayments.SDK.Model.Error? UnsupportedMediaType()
-            {
-                bool suppressDefault = false;
-                OPayments.SDK.Model.Error? result = null;
-                OnUnsupportedMediaType(ref suppressDefault, ref result);
-                if (!suppressDefault)
-                    result = DefaultUnsupportedMediaType();
-                return result;
-            }
-
-            private OPayments.SDK.Model.Error? DefaultUnsupportedMediaType()
-            {
-                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
-                return IsUnsupportedMediaType
-                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.Error>(RawContent, _jsonSerializerOptions)
-                    : null;
-            }
-
-            partial void OnUnsupportedMediaType(ref bool suppressDefault, ref OPayments.SDK.Model.Error? result);
-
-            /// <summary>
-            /// Returns true if the response is 415 UnsupportedMediaType and the deserialized response is not null
-            /// </summary>
-            /// <param name="result"></param>
-            /// <returns></returns>
-            public bool TryUnsupportedMediaType([NotNullWhen(true)]out OPayments.SDK.Model.Error? result)
-            {
-                result = null;
-
-                try
-                {
-                    result = UnsupportedMediaType();
-                } catch (Exception e)
-                {
-                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)415);
-                }
-
-                return result != null;
-            }
-
-            /// <summary>
             /// Returns true if the response is 422 UnprocessableContent
             /// </summary>
             /// <returns></returns>
@@ -913,6 +1062,56 @@ namespace OPayments.SDK.Api
                 } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)422);
+                }
+
+                return result != null;
+            }
+
+            /// <summary>
+            /// Returns true if the response is 415 UnsupportedMediaType
+            /// </summary>
+            /// <returns></returns>
+            public bool IsUnsupportedMediaType => 415 == (int)StatusCode;
+
+            /// <summary>
+            /// Deserializes the response if the response is 415 UnsupportedMediaType
+            /// </summary>
+            /// <returns></returns>
+            public OPayments.SDK.Model.Error? UnsupportedMediaType()
+            {
+                bool suppressDefault = false;
+                OPayments.SDK.Model.Error? result = null;
+                OnUnsupportedMediaType(ref suppressDefault, ref result);
+                if (!suppressDefault)
+                    result = DefaultUnsupportedMediaType();
+                return result;
+            }
+
+            private OPayments.SDK.Model.Error? DefaultUnsupportedMediaType()
+            {
+                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
+                return IsUnsupportedMediaType
+                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.Error>(RawContent, _jsonSerializerOptions)
+                    : null;
+            }
+
+            partial void OnUnsupportedMediaType(ref bool suppressDefault, ref OPayments.SDK.Model.Error? result);
+
+            /// <summary>
+            /// Returns true if the response is 415 UnsupportedMediaType and the deserialized response is not null
+            /// </summary>
+            /// <param name="result"></param>
+            /// <returns></returns>
+            public bool TryUnsupportedMediaType([NotNullWhen(true)]out OPayments.SDK.Model.Error? result)
+            {
+                result = null;
+
+                try
+                {
+                    result = UnsupportedMediaType();
+                } catch (Exception e)
+                {
+                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)415);
                 }
 
                 return result != null;
@@ -1179,17 +1378,17 @@ namespace OPayments.SDK.Api
             partial void OnDeserializationError(ref bool suppressDefaultLog, Exception exception, HttpStatusCode httpStatusCode);
         }
 
-        partial void FormatGetPaymentRefund(ref Guid paymentId);
+        partial void FormatGetRefund(ref Guid refundId);
 
         /// <summary>
         /// Processes the server response
         /// </summary>
         /// <param name="apiResponseLocalVar"></param>
-        /// <param name="paymentId"></param>
-        private void AfterGetPaymentRefundDefaultImplementation(IGetPaymentRefundApiResponse apiResponseLocalVar, Guid paymentId)
+        /// <param name="refundId"></param>
+        private void AfterGetRefundDefaultImplementation(IGetRefundApiResponse apiResponseLocalVar, Guid refundId)
         {
             bool suppressDefaultLog = false;
-            AfterGetPaymentRefund(ref suppressDefaultLog, apiResponseLocalVar, paymentId);
+            AfterGetRefund(ref suppressDefaultLog, apiResponseLocalVar, refundId);
             if (!suppressDefaultLog)
                 Logger.LogInformation(RestLogEvents.ApiRequestCompleted, "{0,-9} | {1} | {2}", (apiResponseLocalVar.DownloadedAt - apiResponseLocalVar.RequestedAt).TotalSeconds, apiResponseLocalVar.StatusCode, apiResponseLocalVar.Path);
         }
@@ -1199,8 +1398,8 @@ namespace OPayments.SDK.Api
         /// </summary>
         /// <param name="suppressDefaultLog"></param>
         /// <param name="apiResponseLocalVar"></param>
-        /// <param name="paymentId"></param>
-        partial void AfterGetPaymentRefund(ref bool suppressDefaultLog, IGetPaymentRefundApiResponse apiResponseLocalVar, Guid paymentId);
+        /// <param name="refundId"></param>
+        partial void AfterGetRefund(ref bool suppressDefaultLog, IGetRefundApiResponse apiResponseLocalVar, Guid refundId);
 
         /// <summary>
         /// Logs exceptions that occur while retrieving the server response
@@ -1208,11 +1407,11 @@ namespace OPayments.SDK.Api
         /// <param name="exceptionLocalVar"></param>
         /// <param name="pathFormatLocalVar"></param>
         /// <param name="pathLocalVar"></param>
-        /// <param name="paymentId"></param>
-        private void OnErrorGetPaymentRefundDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Guid paymentId)
+        /// <param name="refundId"></param>
+        private void OnErrorGetRefundDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Guid refundId)
         {
             bool suppressDefaultLogLocalVar = false;
-            OnErrorGetPaymentRefund(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, paymentId);
+            OnErrorGetRefund(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, refundId);
             if (!suppressDefaultLogLocalVar)
                 Logger.LogError(RestLogEvents.ApiRequestFailed, exceptionLocalVar, "An error occurred while sending the request to the server.");
         }
@@ -1224,20 +1423,20 @@ namespace OPayments.SDK.Api
         /// <param name="exceptionLocalVar"></param>
         /// <param name="pathFormatLocalVar"></param>
         /// <param name="pathLocalVar"></param>
-        /// <param name="paymentId"></param>
-        partial void OnErrorGetPaymentRefund(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Guid paymentId);
+        /// <param name="refundId"></param>
+        partial void OnErrorGetRefund(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Guid refundId);
 
         /// <summary>
         /// Получить возврат 
         /// </summary>
-        /// <param name="paymentId"></param>
+        /// <param name="refundId"></param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns><see cref="Task"/>&lt;<see cref="IGetPaymentRefundApiResponse"/>&gt;</returns>
-        public async Task<IGetPaymentRefundApiResponse?> GetPaymentRefundOrDefaultAsync(Guid paymentId, System.Threading.CancellationToken cancellationToken = default)
+        /// <returns><see cref="Task"/>&lt;<see cref="IGetRefundApiResponse"/>&gt;</returns>
+        public async Task<IGetRefundApiResponse?> GetRefundOrDefaultAsync(Guid refundId, System.Threading.CancellationToken cancellationToken = default)
         {
             try
             {
-                return await GetPaymentRefundAsync(paymentId, cancellationToken).ConfigureAwait(false);
+                return await GetRefundAsync(refundId, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -1249,16 +1448,16 @@ namespace OPayments.SDK.Api
         /// Получить возврат 
         /// </summary>
         /// <exception cref="ApiException">Thrown when fails to make API call</exception>
-        /// <param name="paymentId"></param>
+        /// <param name="refundId"></param>
         /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
-        /// <returns><see cref="Task"/>&lt;<see cref="IGetPaymentRefundApiResponse"/>&gt;</returns>
-        public async Task<IGetPaymentRefundApiResponse> GetPaymentRefundAsync(Guid paymentId, System.Threading.CancellationToken cancellationToken = default)
+        /// <returns><see cref="Task"/>&lt;<see cref="IGetRefundApiResponse"/>&gt;</returns>
+        public async Task<IGetRefundApiResponse> GetRefundAsync(Guid refundId, System.Threading.CancellationToken cancellationToken = default)
         {
             UriBuilder uriBuilderLocalVar = new UriBuilder();
 
             try
             {
-                FormatGetPaymentRefund(ref paymentId);
+                FormatGetRefund(ref refundId);
 
                 using (HttpRequestMessage httpRequestMessageLocalVar = new HttpRequestMessage())
                 {
@@ -1266,9 +1465,9 @@ namespace OPayments.SDK.Api
                     uriBuilderLocalVar.Port = HttpClient.BaseAddress.Port;
                     uriBuilderLocalVar.Scheme = HttpClient.BaseAddress.Scheme;
                     uriBuilderLocalVar.Path = HttpClient.BaseAddress.AbsolutePath == "/"
-                        ? "/payments/{paymentId}/refund"
-                        : string.Concat(HttpClient.BaseAddress.AbsolutePath.TrimEnd('/'), "/payments/{paymentId}/refund");
-                    uriBuilderLocalVar.Path = uriBuilderLocalVar.Path.Replace("%7BpaymentId%7D", Uri.EscapeDataString(paymentId.ToString()));
+                        ? "/refunds/{refundId}"
+                        : string.Concat(HttpClient.BaseAddress.AbsolutePath.TrimEnd('/'), "/refunds/{refundId}");
+                    uriBuilderLocalVar.Path = uriBuilderLocalVar.Path.Replace("%7BrefundId%7D", Uri.EscapeDataString(refundId.ToString()));
 
                     List<TokenBase> tokenBaseLocalVars = new List<TokenBase>();
                     ApiKeyToken apiKeyTokenLocalVar1 = (ApiKeyToken) await ApiKeyProvider.GetAsync("X-Signature", cancellationToken).ConfigureAwait(false);
@@ -1296,20 +1495,20 @@ namespace OPayments.SDK.Api
 
                     using (HttpResponseMessage httpResponseMessageLocalVar = await HttpClient.SendAsync(httpRequestMessageLocalVar, cancellationToken).ConfigureAwait(false))
                     {
-                        GetPaymentRefundApiResponse apiResponseLocalVar;
+                        GetRefundApiResponse apiResponseLocalVar;
 
                         switch ((int)httpResponseMessageLocalVar.StatusCode) {
                             default: {
                                 string responseContentLocalVar = await httpResponseMessageLocalVar.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                                apiResponseLocalVar = new(Logger, httpRequestMessageLocalVar, httpResponseMessageLocalVar, responseContentLocalVar, "/payments/{paymentId}/refund", requestedAtLocalVar, _jsonSerializerOptions);
+                                apiResponseLocalVar = new(Logger, httpRequestMessageLocalVar, httpResponseMessageLocalVar, responseContentLocalVar, "/refunds/{refundId}", requestedAtLocalVar, _jsonSerializerOptions);
 
                                 break;
                             }
                         }
 
-                        AfterGetPaymentRefundDefaultImplementation(apiResponseLocalVar, paymentId);
+                        AfterGetRefundDefaultImplementation(apiResponseLocalVar, refundId);
 
-                        Events.ExecuteOnGetPaymentRefund(apiResponseLocalVar);
+                        Events.ExecuteOnGetRefund(apiResponseLocalVar);
 
                         if (apiResponseLocalVar.StatusCode == (HttpStatusCode) 429)
                             foreach(TokenBase tokenBaseLocalVar in tokenBaseLocalVars)
@@ -1321,16 +1520,16 @@ namespace OPayments.SDK.Api
             }
             catch(Exception e)
             {
-                OnErrorGetPaymentRefundDefaultImplementation(e, "/payments/{paymentId}/refund", uriBuilderLocalVar.Path, paymentId);
-                Events.ExecuteOnErrorGetPaymentRefund(e);
+                OnErrorGetRefundDefaultImplementation(e, "/refunds/{refundId}", uriBuilderLocalVar.Path, refundId);
+                Events.ExecuteOnErrorGetRefund(e);
                 throw;
             }
         }
 
         /// <summary>
-        /// The <see cref="GetPaymentRefundApiResponse"/>
+        /// The <see cref="GetRefundApiResponse"/>
         /// </summary>
-        public partial class GetPaymentRefundApiResponse : OPayments.SDK.Client.ApiResponse, IGetPaymentRefundApiResponse
+        public partial class GetRefundApiResponse : OPayments.SDK.Client.ApiResponse, IGetRefundApiResponse
         {
             /// <summary>
             /// The logger
@@ -1338,7 +1537,7 @@ namespace OPayments.SDK.Api
             public ILogger<RefundsApi> Logger { get; }
 
             /// <summary>
-            /// The <see cref="GetPaymentRefundApiResponse"/>
+            /// The <see cref="GetRefundApiResponse"/>
             /// </summary>
             /// <param name="logger"></param>
             /// <param name="httpRequestMessage"></param>
@@ -1347,14 +1546,14 @@ namespace OPayments.SDK.Api
             /// <param name="path"></param>
             /// <param name="requestedAt"></param>
             /// <param name="jsonSerializerOptions"></param>
-            public GetPaymentRefundApiResponse(ILogger<RefundsApi> logger, System.Net.Http.HttpRequestMessage httpRequestMessage, System.Net.Http.HttpResponseMessage httpResponseMessage, string rawContent, string path, DateTime requestedAt, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) : base(httpRequestMessage, httpResponseMessage, rawContent, path, requestedAt, jsonSerializerOptions)
+            public GetRefundApiResponse(ILogger<RefundsApi> logger, System.Net.Http.HttpRequestMessage httpRequestMessage, System.Net.Http.HttpResponseMessage httpResponseMessage, string rawContent, string path, DateTime requestedAt, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) : base(httpRequestMessage, httpResponseMessage, rawContent, path, requestedAt, jsonSerializerOptions)
             {
                 Logger = logger;
                 OnCreated(httpRequestMessage, httpResponseMessage);
             }
 
             /// <summary>
-            /// The <see cref="GetPaymentRefundApiResponse"/>
+            /// The <see cref="GetRefundApiResponse"/>
             /// </summary>
             /// <param name="logger"></param>
             /// <param name="httpRequestMessage"></param>
@@ -1363,7 +1562,7 @@ namespace OPayments.SDK.Api
             /// <param name="path"></param>
             /// <param name="requestedAt"></param>
             /// <param name="jsonSerializerOptions"></param>
-            public GetPaymentRefundApiResponse(ILogger<RefundsApi> logger, System.Net.Http.HttpRequestMessage httpRequestMessage, System.Net.Http.HttpResponseMessage httpResponseMessage, System.IO.Stream contentStream, string path, DateTime requestedAt, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) : base(httpRequestMessage, httpResponseMessage, contentStream, path, requestedAt, jsonSerializerOptions)
+            public GetRefundApiResponse(ILogger<RefundsApi> logger, System.Net.Http.HttpRequestMessage httpRequestMessage, System.Net.Http.HttpResponseMessage httpResponseMessage, System.IO.Stream contentStream, string path, DateTime requestedAt, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) : base(httpRequestMessage, httpResponseMessage, contentStream, path, requestedAt, jsonSerializerOptions)
             {
                 Logger = logger;
                 OnCreated(httpRequestMessage, httpResponseMessage);
@@ -1566,6 +1765,1009 @@ namespace OPayments.SDK.Api
                 } catch (Exception e)
                 {
                     OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)404);
+                }
+
+                return result != null;
+            }
+
+            /// <summary>
+            /// Returns true if the response is 429 TooManyRequests
+            /// </summary>
+            /// <returns></returns>
+            public bool IsTooManyRequests => 429 == (int)StatusCode;
+
+            /// <summary>
+            /// Deserializes the response if the response is 429 TooManyRequests
+            /// </summary>
+            /// <returns></returns>
+            public OPayments.SDK.Model.Error? TooManyRequests()
+            {
+                bool suppressDefault = false;
+                OPayments.SDK.Model.Error? result = null;
+                OnTooManyRequests(ref suppressDefault, ref result);
+                if (!suppressDefault)
+                    result = DefaultTooManyRequests();
+                return result;
+            }
+
+            private OPayments.SDK.Model.Error? DefaultTooManyRequests()
+            {
+                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
+                return IsTooManyRequests
+                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.Error>(RawContent, _jsonSerializerOptions)
+                    : null;
+            }
+
+            partial void OnTooManyRequests(ref bool suppressDefault, ref OPayments.SDK.Model.Error? result);
+
+            /// <summary>
+            /// Returns true if the response is 429 TooManyRequests and the deserialized response is not null
+            /// </summary>
+            /// <param name="result"></param>
+            /// <returns></returns>
+            public bool TryTooManyRequests([NotNullWhen(true)]out OPayments.SDK.Model.Error? result)
+            {
+                result = null;
+
+                try
+                {
+                    result = TooManyRequests();
+                } catch (Exception e)
+                {
+                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)429);
+                }
+
+                return result != null;
+            }
+
+            private void OnDeserializationErrorDefaultImplementation(Exception exception, HttpStatusCode httpStatusCode)
+            {
+                bool suppressDefaultLog = false;
+                OnDeserializationError(ref suppressDefaultLog, exception, httpStatusCode);
+                if (!suppressDefaultLog)
+                    Logger.LogError(RestLogEvents.ApiDeserializationFailed, exception, "An error occurred while deserializing the {code} response.", httpStatusCode);
+            }
+
+            partial void OnDeserializationError(ref bool suppressDefaultLog, Exception exception, HttpStatusCode httpStatusCode);
+        }
+
+        partial void FormatListPaymentRefunds(ref Guid paymentId, ref Option<string> status, ref Option<RefundReason> reasonCode, ref Option<string> cursor, ref Option<int> limit);
+
+        /// <summary>
+        /// Validates the request parameters
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="cursor"></param>
+        /// <returns></returns>
+        private void ValidateListPaymentRefunds(Option<string> status, Option<string> cursor)
+        {
+            if (status.IsSet && status.Value == null)
+                throw new ArgumentNullException(nameof(status));
+
+            if (cursor.IsSet && cursor.Value == null)
+                throw new ArgumentNullException(nameof(cursor));
+        }
+
+        /// <summary>
+        /// Processes the server response
+        /// </summary>
+        /// <param name="apiResponseLocalVar"></param>
+        /// <param name="paymentId"></param>
+        /// <param name="status"></param>
+        /// <param name="reasonCode"></param>
+        /// <param name="cursor"></param>
+        /// <param name="limit"></param>
+        private void AfterListPaymentRefundsDefaultImplementation(IListPaymentRefundsApiResponse apiResponseLocalVar, Guid paymentId, Option<string> status, Option<RefundReason> reasonCode, Option<string> cursor, Option<int> limit)
+        {
+            bool suppressDefaultLog = false;
+            AfterListPaymentRefunds(ref suppressDefaultLog, apiResponseLocalVar, paymentId, status, reasonCode, cursor, limit);
+            if (!suppressDefaultLog)
+                Logger.LogInformation(RestLogEvents.ApiRequestCompleted, "{0,-9} | {1} | {2}", (apiResponseLocalVar.DownloadedAt - apiResponseLocalVar.RequestedAt).TotalSeconds, apiResponseLocalVar.StatusCode, apiResponseLocalVar.Path);
+        }
+
+        /// <summary>
+        /// Processes the server response
+        /// </summary>
+        /// <param name="suppressDefaultLog"></param>
+        /// <param name="apiResponseLocalVar"></param>
+        /// <param name="paymentId"></param>
+        /// <param name="status"></param>
+        /// <param name="reasonCode"></param>
+        /// <param name="cursor"></param>
+        /// <param name="limit"></param>
+        partial void AfterListPaymentRefunds(ref bool suppressDefaultLog, IListPaymentRefundsApiResponse apiResponseLocalVar, Guid paymentId, Option<string> status, Option<RefundReason> reasonCode, Option<string> cursor, Option<int> limit);
+
+        /// <summary>
+        /// Logs exceptions that occur while retrieving the server response
+        /// </summary>
+        /// <param name="exceptionLocalVar"></param>
+        /// <param name="pathFormatLocalVar"></param>
+        /// <param name="pathLocalVar"></param>
+        /// <param name="paymentId"></param>
+        /// <param name="status"></param>
+        /// <param name="reasonCode"></param>
+        /// <param name="cursor"></param>
+        /// <param name="limit"></param>
+        private void OnErrorListPaymentRefundsDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Guid paymentId, Option<string> status, Option<RefundReason> reasonCode, Option<string> cursor, Option<int> limit)
+        {
+            bool suppressDefaultLogLocalVar = false;
+            OnErrorListPaymentRefunds(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, paymentId, status, reasonCode, cursor, limit);
+            if (!suppressDefaultLogLocalVar)
+                Logger.LogError(RestLogEvents.ApiRequestFailed, exceptionLocalVar, "An error occurred while sending the request to the server.");
+        }
+
+        /// <summary>
+        /// A partial method that gives developers a way to provide customized exception handling
+        /// </summary>
+        /// <param name="suppressDefaultLogLocalVar"></param>
+        /// <param name="exceptionLocalVar"></param>
+        /// <param name="pathFormatLocalVar"></param>
+        /// <param name="pathLocalVar"></param>
+        /// <param name="paymentId"></param>
+        /// <param name="status"></param>
+        /// <param name="reasonCode"></param>
+        /// <param name="cursor"></param>
+        /// <param name="limit"></param>
+        partial void OnErrorListPaymentRefunds(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Guid paymentId, Option<string> status, Option<RefundReason> reasonCode, Option<string> cursor, Option<int> limit);
+
+        /// <summary>
+        /// Найти возвраты платежа 
+        /// </summary>
+        /// <param name="paymentId"></param>
+        /// <param name="status"> (optional)</param>
+        /// <param name="reasonCode"> (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
+        /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns><see cref="Task"/>&lt;<see cref="IListPaymentRefundsApiResponse"/>&gt;</returns>
+        public async Task<IListPaymentRefundsApiResponse?> ListPaymentRefundsOrDefaultAsync(Guid paymentId, Option<string> status = default, Option<RefundReason> reasonCode = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await ListPaymentRefundsAsync(paymentId, status, reasonCode, cursor, limit, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Найти возвраты платежа 
+        /// </summary>
+        /// <exception cref="ApiException">Thrown when fails to make API call</exception>
+        /// <param name="paymentId"></param>
+        /// <param name="status"> (optional)</param>
+        /// <param name="reasonCode"> (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
+        /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns><see cref="Task"/>&lt;<see cref="IListPaymentRefundsApiResponse"/>&gt;</returns>
+        public async Task<IListPaymentRefundsApiResponse> ListPaymentRefundsAsync(Guid paymentId, Option<string> status = default, Option<RefundReason> reasonCode = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default)
+        {
+            UriBuilder uriBuilderLocalVar = new UriBuilder();
+
+            try
+            {
+                ValidateListPaymentRefunds(status, cursor);
+
+                FormatListPaymentRefunds(ref paymentId, ref status, ref reasonCode, ref cursor, ref limit);
+
+                using (HttpRequestMessage httpRequestMessageLocalVar = new HttpRequestMessage())
+                {
+                    uriBuilderLocalVar.Host = HttpClient.BaseAddress!.Host;
+                    uriBuilderLocalVar.Port = HttpClient.BaseAddress.Port;
+                    uriBuilderLocalVar.Scheme = HttpClient.BaseAddress.Scheme;
+                    uriBuilderLocalVar.Path = HttpClient.BaseAddress.AbsolutePath == "/"
+                        ? "/payments/{paymentId}/refunds"
+                        : string.Concat(HttpClient.BaseAddress.AbsolutePath.TrimEnd('/'), "/payments/{paymentId}/refunds");
+                    uriBuilderLocalVar.Path = uriBuilderLocalVar.Path.Replace("%7BpaymentId%7D", Uri.EscapeDataString(paymentId.ToString()));
+
+                    System.Collections.Specialized.NameValueCollection parseQueryStringLocalVar = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+                    if (status.IsSet)
+                        parseQueryStringLocalVar["status"] = ClientUtils.ParameterToString(status.Value);
+
+                    if (reasonCode.IsSet)
+                        parseQueryStringLocalVar["reasonCode"] = ClientUtils.ParameterToString(reasonCode.Value);
+
+                    if (cursor.IsSet)
+                        parseQueryStringLocalVar["cursor"] = ClientUtils.ParameterToString(cursor.Value);
+
+                    if (limit.IsSet)
+                        parseQueryStringLocalVar["limit"] = ClientUtils.ParameterToString(limit.Value);
+
+                    uriBuilderLocalVar.Query = parseQueryStringLocalVar.ToString();
+
+                    List<TokenBase> tokenBaseLocalVars = new List<TokenBase>();
+                    ApiKeyToken apiKeyTokenLocalVar1 = (ApiKeyToken) await ApiKeyProvider.GetAsync("X-Signature", cancellationToken).ConfigureAwait(false);
+                    tokenBaseLocalVars.Add(apiKeyTokenLocalVar1);
+                    apiKeyTokenLocalVar1.UseInHeader(httpRequestMessageLocalVar);
+
+                    ApiKeyToken apiKeyTokenLocalVar2 = (ApiKeyToken) await ApiKeyProvider.GetAsync("X-Identity", cancellationToken).ConfigureAwait(false);
+                    tokenBaseLocalVars.Add(apiKeyTokenLocalVar2);
+                    apiKeyTokenLocalVar2.UseInHeader(httpRequestMessageLocalVar);
+
+                    httpRequestMessageLocalVar.RequestUri = uriBuilderLocalVar.Uri;
+
+                    string[] acceptLocalVars = new string[] {
+                        "application/json"
+                    };
+
+                    IEnumerable<MediaTypeWithQualityHeaderValue> acceptHeaderValuesLocalVar = ClientUtils.SelectHeaderAcceptArray(acceptLocalVars);
+
+                    foreach (var acceptLocalVar in acceptHeaderValuesLocalVar)
+                        httpRequestMessageLocalVar.Headers.Accept.Add(acceptLocalVar);
+
+                    httpRequestMessageLocalVar.Method = HttpMethod.Get;
+
+                    DateTime requestedAtLocalVar = DateTime.UtcNow;
+
+                    using (HttpResponseMessage httpResponseMessageLocalVar = await HttpClient.SendAsync(httpRequestMessageLocalVar, cancellationToken).ConfigureAwait(false))
+                    {
+                        ListPaymentRefundsApiResponse apiResponseLocalVar;
+
+                        switch ((int)httpResponseMessageLocalVar.StatusCode) {
+                            default: {
+                                string responseContentLocalVar = await httpResponseMessageLocalVar.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                                apiResponseLocalVar = new(Logger, httpRequestMessageLocalVar, httpResponseMessageLocalVar, responseContentLocalVar, "/payments/{paymentId}/refunds", requestedAtLocalVar, _jsonSerializerOptions);
+
+                                break;
+                            }
+                        }
+
+                        AfterListPaymentRefundsDefaultImplementation(apiResponseLocalVar, paymentId, status, reasonCode, cursor, limit);
+
+                        Events.ExecuteOnListPaymentRefunds(apiResponseLocalVar);
+
+                        if (apiResponseLocalVar.StatusCode == (HttpStatusCode) 429)
+                            foreach(TokenBase tokenBaseLocalVar in tokenBaseLocalVars)
+                                tokenBaseLocalVar.BeginRateLimit();
+
+                        return apiResponseLocalVar;
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                OnErrorListPaymentRefundsDefaultImplementation(e, "/payments/{paymentId}/refunds", uriBuilderLocalVar.Path, paymentId, status, reasonCode, cursor, limit);
+                Events.ExecuteOnErrorListPaymentRefunds(e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="ListPaymentRefundsApiResponse"/>
+        /// </summary>
+        public partial class ListPaymentRefundsApiResponse : OPayments.SDK.Client.ApiResponse, IListPaymentRefundsApiResponse
+        {
+            /// <summary>
+            /// The logger
+            /// </summary>
+            public ILogger<RefundsApi> Logger { get; }
+
+            /// <summary>
+            /// The <see cref="ListPaymentRefundsApiResponse"/>
+            /// </summary>
+            /// <param name="logger"></param>
+            /// <param name="httpRequestMessage"></param>
+            /// <param name="httpResponseMessage"></param>
+            /// <param name="rawContent"></param>
+            /// <param name="path"></param>
+            /// <param name="requestedAt"></param>
+            /// <param name="jsonSerializerOptions"></param>
+            public ListPaymentRefundsApiResponse(ILogger<RefundsApi> logger, System.Net.Http.HttpRequestMessage httpRequestMessage, System.Net.Http.HttpResponseMessage httpResponseMessage, string rawContent, string path, DateTime requestedAt, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) : base(httpRequestMessage, httpResponseMessage, rawContent, path, requestedAt, jsonSerializerOptions)
+            {
+                Logger = logger;
+                OnCreated(httpRequestMessage, httpResponseMessage);
+            }
+
+            /// <summary>
+            /// The <see cref="ListPaymentRefundsApiResponse"/>
+            /// </summary>
+            /// <param name="logger"></param>
+            /// <param name="httpRequestMessage"></param>
+            /// <param name="httpResponseMessage"></param>
+            /// <param name="contentStream"></param>
+            /// <param name="path"></param>
+            /// <param name="requestedAt"></param>
+            /// <param name="jsonSerializerOptions"></param>
+            public ListPaymentRefundsApiResponse(ILogger<RefundsApi> logger, System.Net.Http.HttpRequestMessage httpRequestMessage, System.Net.Http.HttpResponseMessage httpResponseMessage, System.IO.Stream contentStream, string path, DateTime requestedAt, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) : base(httpRequestMessage, httpResponseMessage, contentStream, path, requestedAt, jsonSerializerOptions)
+            {
+                Logger = logger;
+                OnCreated(httpRequestMessage, httpResponseMessage);
+            }
+
+            partial void OnCreated(global::System.Net.Http.HttpRequestMessage httpRequestMessage, System.Net.Http.HttpResponseMessage httpResponseMessage);
+
+            /// <summary>
+            /// Returns true if the response is 200 Ok
+            /// </summary>
+            /// <returns></returns>
+            public bool IsOk => 200 == (int)StatusCode;
+
+            /// <summary>
+            /// Deserializes the response if the response is 200 Ok
+            /// </summary>
+            /// <returns></returns>
+            public OPayments.SDK.Model.RefundPage? Ok()
+            {
+                bool suppressDefault = false;
+                OPayments.SDK.Model.RefundPage? result = null;
+                OnOk(ref suppressDefault, ref result);
+                if (!suppressDefault)
+                    result = DefaultOk();
+                return result;
+            }
+
+            private OPayments.SDK.Model.RefundPage? DefaultOk()
+            {
+                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
+                return IsOk
+                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.RefundPage>(RawContent, _jsonSerializerOptions)
+                    : null;
+            }
+
+            partial void OnOk(ref bool suppressDefault, ref OPayments.SDK.Model.RefundPage? result);
+
+            /// <summary>
+            /// Returns true if the response is 200 Ok and the deserialized response is not null
+            /// </summary>
+            /// <param name="result"></param>
+            /// <returns></returns>
+            public bool TryOk([NotNullWhen(true)]out OPayments.SDK.Model.RefundPage? result)
+            {
+                result = null;
+
+                try
+                {
+                    result = Ok();
+                } catch (Exception e)
+                {
+                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)200);
+                }
+
+                return result != null;
+            }
+
+            /// <summary>
+            /// Returns true if the response is 400 BadRequest
+            /// </summary>
+            /// <returns></returns>
+            public bool IsBadRequest => 400 == (int)StatusCode;
+
+            /// <summary>
+            /// Deserializes the response if the response is 400 BadRequest
+            /// </summary>
+            /// <returns></returns>
+            public OPayments.SDK.Model.Error? BadRequest()
+            {
+                bool suppressDefault = false;
+                OPayments.SDK.Model.Error? result = null;
+                OnBadRequest(ref suppressDefault, ref result);
+                if (!suppressDefault)
+                    result = DefaultBadRequest();
+                return result;
+            }
+
+            private OPayments.SDK.Model.Error? DefaultBadRequest()
+            {
+                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
+                return IsBadRequest
+                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.Error>(RawContent, _jsonSerializerOptions)
+                    : null;
+            }
+
+            partial void OnBadRequest(ref bool suppressDefault, ref OPayments.SDK.Model.Error? result);
+
+            /// <summary>
+            /// Returns true if the response is 400 BadRequest and the deserialized response is not null
+            /// </summary>
+            /// <param name="result"></param>
+            /// <returns></returns>
+            public bool TryBadRequest([NotNullWhen(true)]out OPayments.SDK.Model.Error? result)
+            {
+                result = null;
+
+                try
+                {
+                    result = BadRequest();
+                } catch (Exception e)
+                {
+                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)400);
+                }
+
+                return result != null;
+            }
+
+            /// <summary>
+            /// Returns true if the response is 401 Unauthorized
+            /// </summary>
+            /// <returns></returns>
+            public bool IsUnauthorized => 401 == (int)StatusCode;
+
+            /// <summary>
+            /// Deserializes the response if the response is 401 Unauthorized
+            /// </summary>
+            /// <returns></returns>
+            public OPayments.SDK.Model.Error? Unauthorized()
+            {
+                bool suppressDefault = false;
+                OPayments.SDK.Model.Error? result = null;
+                OnUnauthorized(ref suppressDefault, ref result);
+                if (!suppressDefault)
+                    result = DefaultUnauthorized();
+                return result;
+            }
+
+            private OPayments.SDK.Model.Error? DefaultUnauthorized()
+            {
+                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
+                return IsUnauthorized
+                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.Error>(RawContent, _jsonSerializerOptions)
+                    : null;
+            }
+
+            partial void OnUnauthorized(ref bool suppressDefault, ref OPayments.SDK.Model.Error? result);
+
+            /// <summary>
+            /// Returns true if the response is 401 Unauthorized and the deserialized response is not null
+            /// </summary>
+            /// <param name="result"></param>
+            /// <returns></returns>
+            public bool TryUnauthorized([NotNullWhen(true)]out OPayments.SDK.Model.Error? result)
+            {
+                result = null;
+
+                try
+                {
+                    result = Unauthorized();
+                } catch (Exception e)
+                {
+                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)401);
+                }
+
+                return result != null;
+            }
+
+            /// <summary>
+            /// Returns true if the response is 404 NotFound
+            /// </summary>
+            /// <returns></returns>
+            public bool IsNotFound => 404 == (int)StatusCode;
+
+            /// <summary>
+            /// Deserializes the response if the response is 404 NotFound
+            /// </summary>
+            /// <returns></returns>
+            public OPayments.SDK.Model.Error? NotFound()
+            {
+                bool suppressDefault = false;
+                OPayments.SDK.Model.Error? result = null;
+                OnNotFound(ref suppressDefault, ref result);
+                if (!suppressDefault)
+                    result = DefaultNotFound();
+                return result;
+            }
+
+            private OPayments.SDK.Model.Error? DefaultNotFound()
+            {
+                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
+                return IsNotFound
+                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.Error>(RawContent, _jsonSerializerOptions)
+                    : null;
+            }
+
+            partial void OnNotFound(ref bool suppressDefault, ref OPayments.SDK.Model.Error? result);
+
+            /// <summary>
+            /// Returns true if the response is 404 NotFound and the deserialized response is not null
+            /// </summary>
+            /// <param name="result"></param>
+            /// <returns></returns>
+            public bool TryNotFound([NotNullWhen(true)]out OPayments.SDK.Model.Error? result)
+            {
+                result = null;
+
+                try
+                {
+                    result = NotFound();
+                } catch (Exception e)
+                {
+                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)404);
+                }
+
+                return result != null;
+            }
+
+            /// <summary>
+            /// Returns true if the response is 429 TooManyRequests
+            /// </summary>
+            /// <returns></returns>
+            public bool IsTooManyRequests => 429 == (int)StatusCode;
+
+            /// <summary>
+            /// Deserializes the response if the response is 429 TooManyRequests
+            /// </summary>
+            /// <returns></returns>
+            public OPayments.SDK.Model.Error? TooManyRequests()
+            {
+                bool suppressDefault = false;
+                OPayments.SDK.Model.Error? result = null;
+                OnTooManyRequests(ref suppressDefault, ref result);
+                if (!suppressDefault)
+                    result = DefaultTooManyRequests();
+                return result;
+            }
+
+            private OPayments.SDK.Model.Error? DefaultTooManyRequests()
+            {
+                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
+                return IsTooManyRequests
+                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.Error>(RawContent, _jsonSerializerOptions)
+                    : null;
+            }
+
+            partial void OnTooManyRequests(ref bool suppressDefault, ref OPayments.SDK.Model.Error? result);
+
+            /// <summary>
+            /// Returns true if the response is 429 TooManyRequests and the deserialized response is not null
+            /// </summary>
+            /// <param name="result"></param>
+            /// <returns></returns>
+            public bool TryTooManyRequests([NotNullWhen(true)]out OPayments.SDK.Model.Error? result)
+            {
+                result = null;
+
+                try
+                {
+                    result = TooManyRequests();
+                } catch (Exception e)
+                {
+                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)429);
+                }
+
+                return result != null;
+            }
+
+            private void OnDeserializationErrorDefaultImplementation(Exception exception, HttpStatusCode httpStatusCode)
+            {
+                bool suppressDefaultLog = false;
+                OnDeserializationError(ref suppressDefaultLog, exception, httpStatusCode);
+                if (!suppressDefaultLog)
+                    Logger.LogError(RestLogEvents.ApiDeserializationFailed, exception, "An error occurred while deserializing the {code} response.", httpStatusCode);
+            }
+
+            partial void OnDeserializationError(ref bool suppressDefaultLog, Exception exception, HttpStatusCode httpStatusCode);
+        }
+
+        partial void FormatListRefunds(ref Option<string> status, ref Option<string> paymentMethod, ref Option<Guid> paymentId, ref Option<RefundReason> reasonCode, ref Option<DateTime> createdFrom, ref Option<DateTime> createdTo, ref Option<string> cursor, ref Option<int> limit);
+
+        /// <summary>
+        /// Validates the request parameters
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="paymentMethod"></param>
+        /// <param name="cursor"></param>
+        /// <returns></returns>
+        private void ValidateListRefunds(Option<string> status, Option<string> paymentMethod, Option<string> cursor)
+        {
+            if (status.IsSet && status.Value == null)
+                throw new ArgumentNullException(nameof(status));
+
+            if (paymentMethod.IsSet && paymentMethod.Value == null)
+                throw new ArgumentNullException(nameof(paymentMethod));
+
+            if (cursor.IsSet && cursor.Value == null)
+                throw new ArgumentNullException(nameof(cursor));
+        }
+
+        /// <summary>
+        /// Processes the server response
+        /// </summary>
+        /// <param name="apiResponseLocalVar"></param>
+        /// <param name="status"></param>
+        /// <param name="paymentMethod"></param>
+        /// <param name="paymentId"></param>
+        /// <param name="reasonCode"></param>
+        /// <param name="createdFrom"></param>
+        /// <param name="createdTo"></param>
+        /// <param name="cursor"></param>
+        /// <param name="limit"></param>
+        private void AfterListRefundsDefaultImplementation(IListRefundsApiResponse apiResponseLocalVar, Option<string> status, Option<string> paymentMethod, Option<Guid> paymentId, Option<RefundReason> reasonCode, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<string> cursor, Option<int> limit)
+        {
+            bool suppressDefaultLog = false;
+            AfterListRefunds(ref suppressDefaultLog, apiResponseLocalVar, status, paymentMethod, paymentId, reasonCode, createdFrom, createdTo, cursor, limit);
+            if (!suppressDefaultLog)
+                Logger.LogInformation(RestLogEvents.ApiRequestCompleted, "{0,-9} | {1} | {2}", (apiResponseLocalVar.DownloadedAt - apiResponseLocalVar.RequestedAt).TotalSeconds, apiResponseLocalVar.StatusCode, apiResponseLocalVar.Path);
+        }
+
+        /// <summary>
+        /// Processes the server response
+        /// </summary>
+        /// <param name="suppressDefaultLog"></param>
+        /// <param name="apiResponseLocalVar"></param>
+        /// <param name="status"></param>
+        /// <param name="paymentMethod"></param>
+        /// <param name="paymentId"></param>
+        /// <param name="reasonCode"></param>
+        /// <param name="createdFrom"></param>
+        /// <param name="createdTo"></param>
+        /// <param name="cursor"></param>
+        /// <param name="limit"></param>
+        partial void AfterListRefunds(ref bool suppressDefaultLog, IListRefundsApiResponse apiResponseLocalVar, Option<string> status, Option<string> paymentMethod, Option<Guid> paymentId, Option<RefundReason> reasonCode, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<string> cursor, Option<int> limit);
+
+        /// <summary>
+        /// Logs exceptions that occur while retrieving the server response
+        /// </summary>
+        /// <param name="exceptionLocalVar"></param>
+        /// <param name="pathFormatLocalVar"></param>
+        /// <param name="pathLocalVar"></param>
+        /// <param name="status"></param>
+        /// <param name="paymentMethod"></param>
+        /// <param name="paymentId"></param>
+        /// <param name="reasonCode"></param>
+        /// <param name="createdFrom"></param>
+        /// <param name="createdTo"></param>
+        /// <param name="cursor"></param>
+        /// <param name="limit"></param>
+        private void OnErrorListRefundsDefaultImplementation(Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Option<string> status, Option<string> paymentMethod, Option<Guid> paymentId, Option<RefundReason> reasonCode, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<string> cursor, Option<int> limit)
+        {
+            bool suppressDefaultLogLocalVar = false;
+            OnErrorListRefunds(ref suppressDefaultLogLocalVar, exceptionLocalVar, pathFormatLocalVar, pathLocalVar, status, paymentMethod, paymentId, reasonCode, createdFrom, createdTo, cursor, limit);
+            if (!suppressDefaultLogLocalVar)
+                Logger.LogError(RestLogEvents.ApiRequestFailed, exceptionLocalVar, "An error occurred while sending the request to the server.");
+        }
+
+        /// <summary>
+        /// A partial method that gives developers a way to provide customized exception handling
+        /// </summary>
+        /// <param name="suppressDefaultLogLocalVar"></param>
+        /// <param name="exceptionLocalVar"></param>
+        /// <param name="pathFormatLocalVar"></param>
+        /// <param name="pathLocalVar"></param>
+        /// <param name="status"></param>
+        /// <param name="paymentMethod"></param>
+        /// <param name="paymentId"></param>
+        /// <param name="reasonCode"></param>
+        /// <param name="createdFrom"></param>
+        /// <param name="createdTo"></param>
+        /// <param name="cursor"></param>
+        /// <param name="limit"></param>
+        partial void OnErrorListRefunds(ref bool suppressDefaultLogLocalVar, Exception exceptionLocalVar, string pathFormatLocalVar, string pathLocalVar, Option<string> status, Option<string> paymentMethod, Option<Guid> paymentId, Option<RefundReason> reasonCode, Option<DateTime> createdFrom, Option<DateTime> createdTo, Option<string> cursor, Option<int> limit);
+
+        /// <summary>
+        /// Найти возвраты проекта Возвращает возвраты по всем платежам текущего проекта. Сортировка всегда &#x60;createdAt DESC, refundId DESC&#x60;; курсор нельзя использовать с другими фильтрами.
+        /// </summary>
+        /// <param name="status"> (optional)</param>
+        /// <param name="paymentMethod"> (optional)</param>
+        /// <param name="paymentId">Идентификатор исходного платежа. (optional)</param>
+        /// <param name="reasonCode"> (optional)</param>
+        /// <param name="createdFrom">Не позже createdTo, если он передан. (optional)</param>
+        /// <param name="createdTo">Не раньше createdFrom, если он передан. (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
+        /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns><see cref="Task"/>&lt;<see cref="IListRefundsApiResponse"/>&gt;</returns>
+        public async Task<IListRefundsApiResponse?> ListRefundsOrDefaultAsync(Option<string> status = default, Option<string> paymentMethod = default, Option<Guid> paymentId = default, Option<RefundReason> reasonCode = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await ListRefundsAsync(status, paymentMethod, paymentId, reasonCode, createdFrom, createdTo, cursor, limit, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Найти возвраты проекта Возвращает возвраты по всем платежам текущего проекта. Сортировка всегда &#x60;createdAt DESC, refundId DESC&#x60;; курсор нельзя использовать с другими фильтрами.
+        /// </summary>
+        /// <exception cref="ApiException">Thrown when fails to make API call</exception>
+        /// <param name="status"> (optional)</param>
+        /// <param name="paymentMethod"> (optional)</param>
+        /// <param name="paymentId">Идентификатор исходного платежа. (optional)</param>
+        /// <param name="reasonCode"> (optional)</param>
+        /// <param name="createdFrom">Не позже createdTo, если он передан. (optional)</param>
+        /// <param name="createdTo">Не раньше createdFrom, если он передан. (optional)</param>
+        /// <param name="cursor">Непрозрачный курсор из предыдущего ответа. Используйте только с теми же фильтрами и сортировкой. При одинаковом sort key API использует стабильный вторичный ID. (optional)</param>
+        /// <param name="limit">Количество записей в ответе. (optional, default to 20)</param>
+        /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+        /// <returns><see cref="Task"/>&lt;<see cref="IListRefundsApiResponse"/>&gt;</returns>
+        public async Task<IListRefundsApiResponse> ListRefundsAsync(Option<string> status = default, Option<string> paymentMethod = default, Option<Guid> paymentId = default, Option<RefundReason> reasonCode = default, Option<DateTime> createdFrom = default, Option<DateTime> createdTo = default, Option<string> cursor = default, Option<int> limit = default, System.Threading.CancellationToken cancellationToken = default)
+        {
+            UriBuilder uriBuilderLocalVar = new UriBuilder();
+
+            try
+            {
+                ValidateListRefunds(status, paymentMethod, cursor);
+
+                FormatListRefunds(ref status, ref paymentMethod, ref paymentId, ref reasonCode, ref createdFrom, ref createdTo, ref cursor, ref limit);
+
+                using (HttpRequestMessage httpRequestMessageLocalVar = new HttpRequestMessage())
+                {
+                    uriBuilderLocalVar.Host = HttpClient.BaseAddress!.Host;
+                    uriBuilderLocalVar.Port = HttpClient.BaseAddress.Port;
+                    uriBuilderLocalVar.Scheme = HttpClient.BaseAddress.Scheme;
+                    uriBuilderLocalVar.Path = HttpClient.BaseAddress.AbsolutePath == "/"
+                        ? "/refunds"
+                        : string.Concat(HttpClient.BaseAddress.AbsolutePath.TrimEnd('/'), "/refunds");
+
+                    System.Collections.Specialized.NameValueCollection parseQueryStringLocalVar = System.Web.HttpUtility.ParseQueryString(string.Empty);
+
+                    if (status.IsSet)
+                        parseQueryStringLocalVar["status"] = ClientUtils.ParameterToString(status.Value);
+
+                    if (paymentMethod.IsSet)
+                        parseQueryStringLocalVar["paymentMethod"] = ClientUtils.ParameterToString(paymentMethod.Value);
+
+                    if (paymentId.IsSet)
+                        parseQueryStringLocalVar["paymentId"] = ClientUtils.ParameterToString(paymentId.Value);
+
+                    if (reasonCode.IsSet)
+                        parseQueryStringLocalVar["reasonCode"] = ClientUtils.ParameterToString(reasonCode.Value);
+
+                    if (createdFrom.IsSet)
+                        parseQueryStringLocalVar["createdFrom"] = ClientUtils.ParameterToString(createdFrom.Value);
+
+                    if (createdTo.IsSet)
+                        parseQueryStringLocalVar["createdTo"] = ClientUtils.ParameterToString(createdTo.Value);
+
+                    if (cursor.IsSet)
+                        parseQueryStringLocalVar["cursor"] = ClientUtils.ParameterToString(cursor.Value);
+
+                    if (limit.IsSet)
+                        parseQueryStringLocalVar["limit"] = ClientUtils.ParameterToString(limit.Value);
+
+                    uriBuilderLocalVar.Query = parseQueryStringLocalVar.ToString();
+
+                    List<TokenBase> tokenBaseLocalVars = new List<TokenBase>();
+                    ApiKeyToken apiKeyTokenLocalVar1 = (ApiKeyToken) await ApiKeyProvider.GetAsync("X-Signature", cancellationToken).ConfigureAwait(false);
+                    tokenBaseLocalVars.Add(apiKeyTokenLocalVar1);
+                    apiKeyTokenLocalVar1.UseInHeader(httpRequestMessageLocalVar);
+
+                    ApiKeyToken apiKeyTokenLocalVar2 = (ApiKeyToken) await ApiKeyProvider.GetAsync("X-Identity", cancellationToken).ConfigureAwait(false);
+                    tokenBaseLocalVars.Add(apiKeyTokenLocalVar2);
+                    apiKeyTokenLocalVar2.UseInHeader(httpRequestMessageLocalVar);
+
+                    httpRequestMessageLocalVar.RequestUri = uriBuilderLocalVar.Uri;
+
+                    string[] acceptLocalVars = new string[] {
+                        "application/json"
+                    };
+
+                    IEnumerable<MediaTypeWithQualityHeaderValue> acceptHeaderValuesLocalVar = ClientUtils.SelectHeaderAcceptArray(acceptLocalVars);
+
+                    foreach (var acceptLocalVar in acceptHeaderValuesLocalVar)
+                        httpRequestMessageLocalVar.Headers.Accept.Add(acceptLocalVar);
+
+                    httpRequestMessageLocalVar.Method = HttpMethod.Get;
+
+                    DateTime requestedAtLocalVar = DateTime.UtcNow;
+
+                    using (HttpResponseMessage httpResponseMessageLocalVar = await HttpClient.SendAsync(httpRequestMessageLocalVar, cancellationToken).ConfigureAwait(false))
+                    {
+                        ListRefundsApiResponse apiResponseLocalVar;
+
+                        switch ((int)httpResponseMessageLocalVar.StatusCode) {
+                            default: {
+                                string responseContentLocalVar = await httpResponseMessageLocalVar.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                                apiResponseLocalVar = new(Logger, httpRequestMessageLocalVar, httpResponseMessageLocalVar, responseContentLocalVar, "/refunds", requestedAtLocalVar, _jsonSerializerOptions);
+
+                                break;
+                            }
+                        }
+
+                        AfterListRefundsDefaultImplementation(apiResponseLocalVar, status, paymentMethod, paymentId, reasonCode, createdFrom, createdTo, cursor, limit);
+
+                        Events.ExecuteOnListRefunds(apiResponseLocalVar);
+
+                        if (apiResponseLocalVar.StatusCode == (HttpStatusCode) 429)
+                            foreach(TokenBase tokenBaseLocalVar in tokenBaseLocalVars)
+                                tokenBaseLocalVar.BeginRateLimit();
+
+                        return apiResponseLocalVar;
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                OnErrorListRefundsDefaultImplementation(e, "/refunds", uriBuilderLocalVar.Path, status, paymentMethod, paymentId, reasonCode, createdFrom, createdTo, cursor, limit);
+                Events.ExecuteOnErrorListRefunds(e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="ListRefundsApiResponse"/>
+        /// </summary>
+        public partial class ListRefundsApiResponse : OPayments.SDK.Client.ApiResponse, IListRefundsApiResponse
+        {
+            /// <summary>
+            /// The logger
+            /// </summary>
+            public ILogger<RefundsApi> Logger { get; }
+
+            /// <summary>
+            /// The <see cref="ListRefundsApiResponse"/>
+            /// </summary>
+            /// <param name="logger"></param>
+            /// <param name="httpRequestMessage"></param>
+            /// <param name="httpResponseMessage"></param>
+            /// <param name="rawContent"></param>
+            /// <param name="path"></param>
+            /// <param name="requestedAt"></param>
+            /// <param name="jsonSerializerOptions"></param>
+            public ListRefundsApiResponse(ILogger<RefundsApi> logger, System.Net.Http.HttpRequestMessage httpRequestMessage, System.Net.Http.HttpResponseMessage httpResponseMessage, string rawContent, string path, DateTime requestedAt, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) : base(httpRequestMessage, httpResponseMessage, rawContent, path, requestedAt, jsonSerializerOptions)
+            {
+                Logger = logger;
+                OnCreated(httpRequestMessage, httpResponseMessage);
+            }
+
+            /// <summary>
+            /// The <see cref="ListRefundsApiResponse"/>
+            /// </summary>
+            /// <param name="logger"></param>
+            /// <param name="httpRequestMessage"></param>
+            /// <param name="httpResponseMessage"></param>
+            /// <param name="contentStream"></param>
+            /// <param name="path"></param>
+            /// <param name="requestedAt"></param>
+            /// <param name="jsonSerializerOptions"></param>
+            public ListRefundsApiResponse(ILogger<RefundsApi> logger, System.Net.Http.HttpRequestMessage httpRequestMessage, System.Net.Http.HttpResponseMessage httpResponseMessage, System.IO.Stream contentStream, string path, DateTime requestedAt, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) : base(httpRequestMessage, httpResponseMessage, contentStream, path, requestedAt, jsonSerializerOptions)
+            {
+                Logger = logger;
+                OnCreated(httpRequestMessage, httpResponseMessage);
+            }
+
+            partial void OnCreated(global::System.Net.Http.HttpRequestMessage httpRequestMessage, System.Net.Http.HttpResponseMessage httpResponseMessage);
+
+            /// <summary>
+            /// Returns true if the response is 200 Ok
+            /// </summary>
+            /// <returns></returns>
+            public bool IsOk => 200 == (int)StatusCode;
+
+            /// <summary>
+            /// Deserializes the response if the response is 200 Ok
+            /// </summary>
+            /// <returns></returns>
+            public OPayments.SDK.Model.RefundPage? Ok()
+            {
+                bool suppressDefault = false;
+                OPayments.SDK.Model.RefundPage? result = null;
+                OnOk(ref suppressDefault, ref result);
+                if (!suppressDefault)
+                    result = DefaultOk();
+                return result;
+            }
+
+            private OPayments.SDK.Model.RefundPage? DefaultOk()
+            {
+                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
+                return IsOk
+                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.RefundPage>(RawContent, _jsonSerializerOptions)
+                    : null;
+            }
+
+            partial void OnOk(ref bool suppressDefault, ref OPayments.SDK.Model.RefundPage? result);
+
+            /// <summary>
+            /// Returns true if the response is 200 Ok and the deserialized response is not null
+            /// </summary>
+            /// <param name="result"></param>
+            /// <returns></returns>
+            public bool TryOk([NotNullWhen(true)]out OPayments.SDK.Model.RefundPage? result)
+            {
+                result = null;
+
+                try
+                {
+                    result = Ok();
+                } catch (Exception e)
+                {
+                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)200);
+                }
+
+                return result != null;
+            }
+
+            /// <summary>
+            /// Returns true if the response is 400 BadRequest
+            /// </summary>
+            /// <returns></returns>
+            public bool IsBadRequest => 400 == (int)StatusCode;
+
+            /// <summary>
+            /// Deserializes the response if the response is 400 BadRequest
+            /// </summary>
+            /// <returns></returns>
+            public OPayments.SDK.Model.Error? BadRequest()
+            {
+                bool suppressDefault = false;
+                OPayments.SDK.Model.Error? result = null;
+                OnBadRequest(ref suppressDefault, ref result);
+                if (!suppressDefault)
+                    result = DefaultBadRequest();
+                return result;
+            }
+
+            private OPayments.SDK.Model.Error? DefaultBadRequest()
+            {
+                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
+                return IsBadRequest
+                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.Error>(RawContent, _jsonSerializerOptions)
+                    : null;
+            }
+
+            partial void OnBadRequest(ref bool suppressDefault, ref OPayments.SDK.Model.Error? result);
+
+            /// <summary>
+            /// Returns true if the response is 400 BadRequest and the deserialized response is not null
+            /// </summary>
+            /// <param name="result"></param>
+            /// <returns></returns>
+            public bool TryBadRequest([NotNullWhen(true)]out OPayments.SDK.Model.Error? result)
+            {
+                result = null;
+
+                try
+                {
+                    result = BadRequest();
+                } catch (Exception e)
+                {
+                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)400);
+                }
+
+                return result != null;
+            }
+
+            /// <summary>
+            /// Returns true if the response is 401 Unauthorized
+            /// </summary>
+            /// <returns></returns>
+            public bool IsUnauthorized => 401 == (int)StatusCode;
+
+            /// <summary>
+            /// Deserializes the response if the response is 401 Unauthorized
+            /// </summary>
+            /// <returns></returns>
+            public OPayments.SDK.Model.Error? Unauthorized()
+            {
+                bool suppressDefault = false;
+                OPayments.SDK.Model.Error? result = null;
+                OnUnauthorized(ref suppressDefault, ref result);
+                if (!suppressDefault)
+                    result = DefaultUnauthorized();
+                return result;
+            }
+
+            private OPayments.SDK.Model.Error? DefaultUnauthorized()
+            {
+                // NOTICE: Consider this AsModel template deprecated. Implement the appropriate partial method instead
+                return IsUnauthorized
+                    ? System.Text.Json.JsonSerializer.Deserialize<OPayments.SDK.Model.Error>(RawContent, _jsonSerializerOptions)
+                    : null;
+            }
+
+            partial void OnUnauthorized(ref bool suppressDefault, ref OPayments.SDK.Model.Error? result);
+
+            /// <summary>
+            /// Returns true if the response is 401 Unauthorized and the deserialized response is not null
+            /// </summary>
+            /// <param name="result"></param>
+            /// <returns></returns>
+            public bool TryUnauthorized([NotNullWhen(true)]out OPayments.SDK.Model.Error? result)
+            {
+                result = null;
+
+                try
+                {
+                    result = Unauthorized();
+                } catch (Exception e)
+                {
+                    OnDeserializationErrorDefaultImplementation(e, (HttpStatusCode)401);
                 }
 
                 return result != null;

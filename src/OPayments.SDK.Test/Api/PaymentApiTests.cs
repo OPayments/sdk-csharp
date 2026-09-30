@@ -57,7 +57,8 @@ namespace OPayments.SDK.Test.Api
         public async Task CreateSbpPaymentAsyncTest()
         {
             CreateSbpPaymentRequest createSbpPaymentRequest = default!;
-            var response = await _instance.CreateSbpPaymentAsync(createSbpPaymentRequest);
+            Client.Option<string> idempotencyKey = default!;
+            var response = await _instance.CreateSbpPaymentAsync(createSbpPaymentRequest, idempotencyKey);
             var model = response.Ok();
             Assert.IsType<OPayments.SDK.Model.Payment>(model);
         }
@@ -69,7 +70,8 @@ namespace OPayments.SDK.Test.Api
         public async Task CreateTpayPaymentAsyncTest()
         {
             CreateTpayPaymentRequest createTpayPaymentRequest = default!;
-            var response = await _instance.CreateTpayPaymentAsync(createTpayPaymentRequest);
+            Client.Option<string> idempotencyKey = default!;
+            var response = await _instance.CreateTpayPaymentAsync(createTpayPaymentRequest, idempotencyKey);
             var model = response.Ok();
             Assert.IsType<OPayments.SDK.Model.Payment>(model);
         }

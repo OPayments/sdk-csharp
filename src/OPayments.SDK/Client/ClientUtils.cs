@@ -145,10 +145,6 @@ namespace OPayments.SDK.Client
                     : "false";
             if (obj is Balance.CurrencyEnum balanceCurrencyEnum)
                 return Balance.CurrencyEnumToJsonValue(balanceCurrencyEnum);
-            if (obj is CreateSbpPaymentRequest.CurrencyEnum createSbpPaymentRequestCurrencyEnum)
-                return CreateSbpPaymentRequest.CurrencyEnumToJsonValue(createSbpPaymentRequestCurrencyEnum);
-            if (obj is CreateTpayPaymentRequest.CurrencyEnum createTpayPaymentRequestCurrencyEnum)
-                return CreateTpayPaymentRequest.CurrencyEnumToJsonValue(createTpayPaymentRequestCurrencyEnum);
             if (obj is CreatedPayment.CurrencyEnum createdPaymentCurrencyEnum)
                 return CreatedPayment.CurrencyEnumToJsonValue(createdPaymentCurrencyEnum);
             if (obj is CreatedPayment.PaymentMethodEnum createdPaymentPaymentMethodEnum)
@@ -197,6 +193,8 @@ namespace OPayments.SDK.Client
                 return Refund.CurrencyEnumToJsonValue(refundCurrencyEnum);
             if (obj is Refund.StatusEnum refundStatusEnum)
                 return Refund.StatusEnumToJsonValue(refundStatusEnum);
+            if (obj is RefundReason refundReason)
+                return RefundReasonValueConverter.ToJsonValue(refundReason);
             if (obj is RefundWebhookNotification.NotificationTypeEnum refundWebhookNotificationNotificationTypeEnum)
                 return RefundWebhookNotification.NotificationTypeEnumToJsonValue(refundWebhookNotificationNotificationTypeEnum);
             if (obj is TpayDeviceData.PlatformTypeEnum tpayDeviceDataPlatformTypeEnum)
